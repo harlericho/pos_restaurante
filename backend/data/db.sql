@@ -171,6 +171,34 @@ CREATE TABLE empresa (
 INSERT IGNORE INTO empresa (id) VALUES (1);
 
 -- ============================================================
+-- MÓDULO PRODUCTOS TERMINADOS
+-- ============================================================
+ALTER TABLE productos ADD COLUMN codigo VARCHAR(50) NULL UNIQUE AFTER id;
+ALTER TABLE productos ADD COLUMN tipo ENUM('elaborado','terminado') NOT NULL DEFAULT 'elaborado' AFTER descripcion;
+ALTER TABLE productos ADD COLUMN stock DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER tipo;
+
+-- Reemplazar trigger: ahora maneja elaborado (descuenta insumos) y terminado (descuenta stock propio)
+DROP TRIGGER IF EXISTS descontar_insumos;
+
+DELIMITER $$
+CREATE TRIGGER descontar_stock
+AFTER INSERT ON pedido_detalle
+FOR EACH ROW
+BEGIN
+    -- Descuenta insumos para productos elaborados (por receta)
+    UPDATE insumos i
+    JOIN recetas r ON r.insumo_id = i.id
+    SET i.stock = i.stock - (r.cantidad * NEW.cantidad)
+    WHERE r.producto_id = NEW.producto_id;
+
+    -- Descuenta stock propio para productos terminados
+    UPDATE productos
+    SET stock = stock - NEW.cantidad
+    WHERE id = NEW.producto_id AND tipo = 'terminado';
+END$$
+DELIMITER ;
+
+-- ============================================================
 -- DATOS INICIALES
 -- ============================================================
 

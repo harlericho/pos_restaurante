@@ -102,7 +102,9 @@ async function loadProductos() {
 
   try {
     var resp = await ProductosAPI.getAll();
-    var prods = resp.data || [];
+    var prods = (resp.data || []).filter(function (p) {
+      return !p.tipo || p.tipo === "elaborado";
+    });
     _productos = prods;
 
     tbody.innerHTML = prods

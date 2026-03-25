@@ -683,7 +683,10 @@ async function generarFacturaPDF() {
 
     var productoRows = detalle.map(function (item) {
       return [
-        { text: String(item.producto_id || ""), fontSize: 9 },
+        {
+          text: item.producto_codigo ? String(item.producto_codigo) : "—",
+          fontSize: 9,
+        },
         { text: String(item.cantidad), fontSize: 9, alignment: "center" },
         { text: item.producto_nombre || "—", fontSize: 9 },
         {

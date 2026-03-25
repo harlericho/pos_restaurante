@@ -76,6 +76,17 @@ document.addEventListener("DOMContentLoaded", function () {
     btnConfirmar.addEventListener("click", deleteProducto);
   }
 
+  // ── Toggle campo stock según tipo ────────────────────────────────────────
+  var prodTipoEl = document.getElementById("prod-tipo");
+  if (prodTipoEl) {
+    prodTipoEl.addEventListener("change", function () {
+      var grupoStock = document.getElementById("grupo-stock");
+      if (grupoStock) {
+        grupoStock.style.display = this.value === "terminado" ? "" : "none";
+      }
+    });
+  }
+
   // ── Carga inicial ────────────────────────────────────────────────────────
   loadCategorias().then(function () {
     loadProductos();
@@ -114,7 +125,7 @@ async function loadProductos(categoriaId) {
   }
 
   tbody.innerHTML =
-    '<tr><td colspan="6" class="text-center text-muted py-4">' +
+    '<tr><td colspan="7" class="text-center text-muted py-4">' +
     '<i class="fas fa-spinner fa-spin mr-2"></i>Cargando...</td></tr>';
 
   try {
@@ -145,6 +156,13 @@ async function loadProductos(categoriaId) {
             "</td>"
           : "";
 
+        var tipoCell =
+          p.tipo === "terminado"
+            ? '<span class="badge badge-success">Terminado</span><br><small>Stock: ' +
+              parseFloat(p.stock || 0).toFixed(0) +
+              "</small>"
+            : '<span class="badge badge-info">Elaborado</span>';
+
         return (
           "<tr>" +
           "<td>" +
@@ -162,6 +180,9 @@ async function loadProductos(categoriaId) {
           "<td>" +
           precio +
           "</td>" +
+          "<td>" +
+          tipoCell +
+          "</td>" +
           acciones +
           "</tr>"
         );
@@ -169,10 +190,10 @@ async function loadProductos(categoriaId) {
       .join("");
 
     if (prods.length === 0) tbody.innerHTML = "";
-    initDataTable("#table-productos", isAdmin ? 6 : 5);
+    initDataTable("#table-productos", isAdmin ? 7 : 6);
   } catch (err) {
     tbody.innerHTML =
-      '<tr><td colspan="6" class="text-center text-danger py-4">' +
+      '<tr><td colspan="7" class="text-center text-danger py-4">' +
       '<i class="fas fa-exclamation-triangle mr-2"></i>' +
       (err.data && err.data.error
         ? err.data.error
@@ -201,6 +222,10 @@ function openModal(prod) {
   var catEl = document.getElementById("prod-categoria");
   var precioEl = document.getElementById("prod-precio");
   var descEl = document.getElementById("prod-descripcion");
+  var codigoEl = document.getElementById("prod-codigo");
+  var tipoEl = document.getElementById("prod-tipo");
+  var stockEl = document.getElementById("prod-stock");
+  var grupoStock = document.getElementById("grupo-stock");
   var form = document.getElementById("form-producto");
 
   // Limpiar validación
@@ -216,6 +241,10 @@ function openModal(prod) {
     precioEl.value = parseFloat(prod.precio).toFixed(2);
     descEl.value = prod.descripcion || "";
     catEl.value = prod.categoria_id || "";
+    codigoEl.value = prod.codigo || "";
+    tipoEl.value = prod.tipo || "elaborado";
+    stockEl.value = parseFloat(prod.stock || 0).toFixed(0);
+    grupoStock.style.display = prod.tipo === "terminado" ? "" : "none";
   } else {
     titleEl.textContent = "Nuevo Producto";
     idEl.value = "";
@@ -223,6 +252,10 @@ function openModal(prod) {
     precioEl.value = "";
     descEl.value = "";
     catEl.value = "";
+    codigoEl.value = "";
+    tipoEl.value = "elaborado";
+    stockEl.value = "0";
+    grupoStock.style.display = "none";
   }
 
   $("#modal-producto").modal("show");
@@ -238,6 +271,9 @@ async function saveProducto() {
   var catEl = document.getElementById("prod-categoria");
   var precioEl = document.getElementById("prod-precio");
   var descEl = document.getElementById("prod-descripcion");
+  var codigoEl = document.getElementById("prod-codigo");
+  var tipoEl = document.getElementById("prod-tipo");
+  var stockEl = document.getElementById("prod-stock");
   var btnSave = document.getElementById("btn-guardar-producto");
 
   var valid = true;
@@ -272,6 +308,9 @@ async function saveProducto() {
     precio: parseFloat(precio),
     descripcion: descEl.value.trim() || null,
     categoria_id: catEl.value ? parseInt(catEl.value) : null,
+    codigo: codigoEl.value.trim() || null,
+    tipo: tipoEl.value || "elaborado",
+    stock: parseFloat(stockEl.value || 0),
   };
 
   try {

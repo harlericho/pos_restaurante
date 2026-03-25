@@ -55,7 +55,7 @@ class PedidoModel
     if (!$pedido) return false;
 
     $stmt = $this->db->prepare("
-            SELECT pd.*, pr.nombre AS producto_nombre
+            SELECT pd.*, pr.nombre AS producto_nombre, pr.codigo AS producto_codigo
             FROM pedido_detalle pd
             JOIN productos pr ON pr.id = pd.producto_id
             WHERE pd.pedido_id = ?

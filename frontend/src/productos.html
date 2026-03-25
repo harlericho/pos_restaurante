@@ -275,6 +275,7 @@
                         <th>Categoría</th>
                         <th>Descripción</th>
                         <th style="width: 100px">Precio</th>
+                        <th style="width: 100px">Tipo</th>
                         <th
                           class="admin-only text-center"
                           style="width: 120px; display: none"
@@ -379,6 +380,41 @@
                   placeholder="Descripción opcional..."
                   maxlength="255"
                 ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="prod-codigo">Código / Cód. Barras</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="prod-codigo"
+                  maxlength="50"
+                  placeholder="Ej: 7702172011515"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="prod-tipo"
+                  >Tipo <span class="text-danger">*</span></label
+                >
+                <select class="form-control" id="prod-tipo">
+                  <option value="elaborado">
+                    Elaborado (usa receta de insumos)
+                  </option>
+                  <option value="terminado">Terminado (stock propio)</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="grupo-stock" style="display: none">
+                <label for="prod-stock">Stock</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="prod-stock"
+                  min="0"
+                  step="1"
+                  value="0"
+                />
               </div>
             </div>
             <div class="modal-footer">

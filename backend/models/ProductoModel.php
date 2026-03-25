@@ -51,13 +51,16 @@ class ProductoModel
   public function create(array $data): int
   {
     $stmt = $this->db->prepare(
-      "INSERT INTO productos (nombre, descripcion, precio, categoria_id, estado) VALUES (?, ?, ?, ?, 1)"
+      "INSERT INTO productos (nombre, descripcion, precio, categoria_id, codigo, tipo, stock, estado) VALUES (?, ?, ?, ?, ?, ?, ?, 1)"
     );
     $stmt->execute([
       trim($data['nombre']),
       $data['descripcion'] ?? null,
       $data['precio'],
       $data['categoria_id'] ?? null,
+      $data['codigo'] ?? null,
+      $data['tipo'] ?? 'elaborado',
+      $data['stock'] ?? 0,
     ]);
     return (int) $this->db->lastInsertId();
   }
@@ -67,7 +70,7 @@ class ProductoModel
     $fields = [];
     $params = [];
 
-    foreach (['nombre', 'descripcion', 'precio', 'categoria_id', 'estado'] as $field) {
+    foreach (['nombre', 'descripcion', 'precio', 'categoria_id', 'codigo', 'tipo', 'stock', 'estado'] as $field) {
       if (array_key_exists($field, $data)) {
         $fields[] = "$field = ?";
         $params[] = $field === 'nombre' ? trim($data[$field]) : $data[$field];
