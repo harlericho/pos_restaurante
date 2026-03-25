@@ -62,7 +62,13 @@ async function loadDashboard() {
     ).length;
 
     // Ventas / ingresos hoy
-    var hoy = new Date().toISOString().split("T")[0];
+    var _ahora = new Date();
+    var hoy =
+      _ahora.getFullYear() +
+      "-" +
+      String(_ahora.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(_ahora.getDate()).padStart(2, "0");
     try {
       var reporteResp = await VentasAPI.getReporte(hoy, hoy);
       var totales =
