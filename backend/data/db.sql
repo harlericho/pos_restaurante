@@ -143,6 +143,19 @@ CREATE TABLE clientes (
 ALTER TABLE ventas ADD COLUMN cliente_id INT NULL AFTER pedido_id;
 ALTER TABLE ventas ADD CONSTRAINT fk_ventas_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL;
 
+-- Número de factura por venta
+ALTER TABLE ventas ADD COLUMN numero_factura VARCHAR(30) NULL AFTER cliente_id;
+
+-- Configuración de serie de factura
+CREATE TABLE factura_config (
+    id INT PRIMARY KEY DEFAULT 1,
+    establecimiento VARCHAR(10) NOT NULL DEFAULT '001',
+    punto_emision   VARCHAR(10) NOT NULL DEFAULT '001',
+    secuencial      INT NOT NULL DEFAULT 0,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+INSERT INTO factura_config (id, establecimiento, punto_emision, secuencial) VALUES (1, '001', '001', 0);
+
 -- ============================================================
 -- DATOS INICIALES
 -- ============================================================

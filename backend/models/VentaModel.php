@@ -2,6 +2,7 @@
 // models/VentaModel.php
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/FacturaConfigModel.php';
 
 class VentaModel
 {
@@ -16,7 +17,8 @@ class VentaModel
   {
     return $this->db->query("
             SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
-                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit
+                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit,
+                   v.numero_factura
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id
             JOIN mesas m ON m.id = p.mesa_id
@@ -30,7 +32,8 @@ class VentaModel
   {
     $stmt = $this->db->prepare("
             SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
-                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit
+                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit,
+                   v.numero_factura
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id
             JOIN mesas m ON m.id = p.mesa_id
@@ -50,11 +53,15 @@ class VentaModel
   {
     $this->db->beginTransaction();
     try {
+      // Generar número de factura dentro de la transacción (atómico)
+      $facturaModel  = new FacturaConfigModel();
+      $numeroFactura = $facturaModel->generarNumero();
+
       $clienteId = $data['cliente_id'] ?? null;
       $stmt = $this->db->prepare(
-        "INSERT INTO ventas (pedido_id, cliente_id, total, metodo_pago) VALUES (?, ?, ?, ?)"
+        "INSERT INTO ventas (pedido_id, cliente_id, numero_factura, total, metodo_pago) VALUES (?, ?, ?, ?, ?)"
       );
-      $stmt->execute([$data['pedido_id'], $clienteId, $data['total'], $data['metodo_pago']]);
+      $stmt->execute([$data['pedido_id'], $clienteId, $numeroFactura, $data['total'], $data['metodo_pago']]);
       $ventaId = (int) $this->db->lastInsertId();
 
       // Cerrar el pedido
@@ -73,7 +80,8 @@ class VentaModel
   {
     $stmt = $this->db->prepare("
             SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
-                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit
+                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit,
+                   v.numero_factura
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id
             JOIN mesas m ON m.id = p.mesa_id

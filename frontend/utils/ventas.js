@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Inicializar tabla vacía (limpiar tbody para evitar error _DT_CellIndex)
     document.getElementById("tbody-ventas").innerHTML = "";
-    initDataTable("#table-ventas", 6);
+    initDataTable("#table-ventas", 7);
     _reporteCargado = true;
   }
 
@@ -182,13 +182,22 @@ async function registrarCobro() {
     $("#modal-cobrar").modal("hide");
 
     var venta = resp.data || {};
-    showAlert(
-      "success",
-      "Venta registrada correctamente. ID Venta: #" +
-        (venta.id || "") +
-        " — Total: $" +
-        parseFloat(venta.total || 0).toFixed(2),
-    );
+
+    // Mostrar comprobante con número de factura
+    document.getElementById("comp-numero-factura").textContent =
+      venta.numero_factura || "S/N";
+    document.getElementById("comp-venta-id").textContent =
+      "#" + (venta.id || "");
+    document.getElementById("comp-total").textContent =
+      "$" + parseFloat(venta.total || 0).toFixed(2);
+    var metodosLabel = {
+      efectivo: "Efectivo",
+      tarjeta: "Tarjeta",
+      transferencia: "Transferencia",
+    };
+    document.getElementById("comp-metodo").textContent =
+      metodosLabel[venta.metodo_pago] || venta.metodo_pago || "—";
+    $("#modal-comprobante").modal("show");
 
     // Recargar pedidos abiertos
     loadPedidosAbiertos();
@@ -299,6 +308,9 @@ async function loadReporte() {
           badge +
           "</td>" +
           "<td>" +
+          escapeHtml(v.numero_factura || "—") +
+          "</td>" +
+          "<td>" +
           escapeHtml(fecha) +
           "</td>" +
           "</tr>"
@@ -308,7 +320,7 @@ async function loadReporte() {
 
     if (ventas.length === 0) tbody.innerHTML = "";
 
-    initDataTable("#table-ventas", 6);
+    initDataTable("#table-ventas", 7);
     _reporteCargado = true;
   } catch (err) {
     console.error("[loadReporte]", err);
@@ -318,7 +330,7 @@ async function loadReporte() {
       "Error al cargar el reporte.";
     showAlert("danger", msg);
     tbody.innerHTML = "";
-    initDataTable("#table-ventas", 6);
+    initDataTable("#table-ventas", 7);
   }
 }
 

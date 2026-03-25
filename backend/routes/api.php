@@ -27,6 +27,7 @@ require_once __DIR__ . '/../models/MesaModel.php';
 require_once __DIR__ . '/../models/PedidoModel.php';
 require_once __DIR__ . '/../models/VentaModel.php';
 require_once __DIR__ . '/../models/ClienteModel.php';
+require_once __DIR__ . '/../models/FacturaConfigModel.php';
 
 // ── Controllers ───────────────────────────────────────────────────────────────
 require_once __DIR__ . '/../controllers/AuthController.php';
@@ -39,6 +40,7 @@ require_once __DIR__ . '/../controllers/MesaController.php';
 require_once __DIR__ . '/../controllers/PedidoController.php';
 require_once __DIR__ . '/../controllers/VentaController.php';
 require_once __DIR__ . '/../controllers/ClienteController.php';
+require_once __DIR__ . '/../controllers/FacturaConfigController.php';
 
 // ── Router ────────────────────────────────────────────────────────────────────
 class Router
@@ -147,7 +149,9 @@ $router->add('GET',    '/api/clientes/{id}',  [ClienteController::class, 'show']
 $router->add('POST',   '/api/clientes',       [ClienteController::class, 'store']);
 $router->add('PUT',    '/api/clientes/{id}',  [ClienteController::class, 'update']);
 $router->add('DELETE', '/api/clientes/{id}',  [ClienteController::class, 'destroy']);
-
+// ── Factura Config ──────────────────────────────────────────────────
+$router->add('GET', '/api/factura-config',    [FacturaConfigController::class, 'show']);
+$router->add('PUT', '/api/factura-config',    [FacturaConfigController::class, 'update']);
 // ── Dispatch ──────────────────────────────────────────────────────────────────
 // Determinar la URI relativa al directorio del script (public/)
 $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');

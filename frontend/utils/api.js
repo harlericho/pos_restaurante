@@ -242,3 +242,12 @@ var ClientesAPI = {
     return request("DELETE", "/api/clientes/" + id);
   },
 };
+
+var FacturaConfigAPI = {
+  get: function () {
+    return request("GET", "/api/factura-config");
+  },
+  update: function (data) {
+    return request("PUT", "/api/factura-config", data);
+  },
+};

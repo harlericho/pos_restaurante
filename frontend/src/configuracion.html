@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pos Restaurante | Mesas</title>
+    <title>Pos Restaurante | Configuración</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
@@ -14,11 +14,6 @@
       href="../plugins/overlayScrollbars/css/OverlayScrollbars.min.css"
     />
     <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
-    <!-- DataTables -->
-    <link
-      rel="stylesheet"
-      href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css"
-    />
     <!-- Favicon icono -->
     <link rel="icon" href="../dist/img/favicon.ico" type="image/png" />
   </head>
@@ -125,7 +120,7 @@
                 >
               </li>
               <li class="nav-item">
-                <a href="mesas.html" class="nav-link active"
+                <a href="mesas.html" class="nav-link"
                   ><i class="nav-icon fas fa-chair"></i>
                   <p>Mesas</p></a
                 >
@@ -168,23 +163,21 @@
                   <p>Recetas</p></a
                 >
               </li>
-              <li class="nav-header admin-only" style="display: none">
-                ADMINISTRACIÓN
-              </li>
-              <li class="nav-item admin-only" style="display: none">
+              <li class="nav-header">ADMINISTRACIÓN</li>
+              <li class="nav-item">
                 <a href="clientes.html" class="nav-link"
                   ><i class="nav-icon fas fa-user-friends"></i>
                   <p>Clientes</p></a
                 >
               </li>
-              <li class="nav-item admin-only" style="display: none">
+              <li class="nav-item">
                 <a href="usuarios.html" class="nav-link"
                   ><i class="nav-icon fas fa-users-cog"></i>
                   <p>Usuarios</p></a
                 >
               </li>
-              <li class="nav-item admin-only" style="display: none">
-                <a href="configuracion.html" class="nav-link"
+              <li class="nav-item active">
+                <a href="configuracion.html" class="nav-link active"
                   ><i class="nav-icon fas fa-cog"></i>
                   <p>Configuración</p></a
                 >
@@ -199,13 +192,15 @@
         <div class="content-header">
           <div class="container-fluid">
             <div class="row mb-2">
-              <div class="col-sm-6"><h1 class="m-0">Mesas</h1></div>
+              <div class="col-sm-6">
+                <h1 class="m-0">Configuración</h1>
+              </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                   <li class="breadcrumb-item">
                     <a href="index.html">Inicio</a>
                   </li>
-                  <li class="breadcrumb-item active">Mesas</li>
+                  <li class="breadcrumb-item active">Configuración</li>
                 </ol>
               </div>
             </div>
@@ -214,79 +209,110 @@
 
         <section class="content">
           <div class="container-fluid">
-            <!-- Alert -->
-            <div id="alert-box" class="d-none"></div>
+            <!-- Alerta global -->
+            <div id="alert-box" class="d-none mb-3"></div>
 
-            <!-- Resumen de estados -->
-            <div class="row mb-3">
-              <div class="col-6 col-md-3">
-                <div class="info-box">
-                  <span class="info-box-icon bg-success elevation-1"
-                    ><i class="fas fa-chair"></i
-                  ></span>
-                  <div class="info-box-content">
-                    <span class="info-box-text">Libres</span>
-                    <span class="info-box-number" id="stat-libres">—</span>
+            <div class="row">
+              <!-- Serie de Factura -->
+              <div class="col-md-6">
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <i class="fas fa-file-invoice mr-2"></i>Serie de Factura
+                    </h3>
                   </div>
-                </div>
-              </div>
-              <div class="col-6 col-md-3">
-                <div class="info-box">
-                  <span class="info-box-icon bg-warning elevation-1"
-                    ><i class="fas fa-utensils"></i
-                  ></span>
-                  <div class="info-box-content">
-                    <span class="info-box-text">Ocupadas</span>
-                    <span class="info-box-number" id="stat-ocupadas">—</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card tabla -->
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-chair mr-2"></i>Listado de Mesas
-                </h3>
-                <div class="card-tools">
-                  <button
-                    id="btn-nueva-mesa"
-                    class="btn btn-primary btn-sm admin-only"
-                    style="display: none"
-                  >
-                    <i class="fas fa-plus mr-1"></i> Nueva Mesa
-                  </button>
-                </div>
-              </div>
-              <div class="card-body p-0">
-                <div class="table-responsive">
-                  <table
-                    id="table-mesas"
-                    class="table table-hover table-striped m-0"
-                    style="width: 100%"
-                  >
-                    <thead>
-                      <tr>
-                        <th style="width: 60px">#</th>
-                        <th>N° Mesa</th>
-                        <th style="width: 130px">Estado</th>
-                        <th
-                          class="admin-only text-center"
-                          style="width: 160px; display: none"
+                  <form id="form-factura-config" novalidate>
+                    <div class="card-body">
+                      <p class="text-muted mb-3">
+                        El número de factura se genera automáticamente en cada
+                        venta con el formato:
+                        <strong
+                          ><code id="preview-factura" class="text-primary"
+                            >001-001-000000001</code
+                          ></strong
                         >
-                          Acciones
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody id="tbody-mesas">
-                      <tr>
-                        <td colspan="4" class="text-center text-muted py-4">
-                          <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                      </p>
+
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <div class="form-group">
+                            <label for="cfg-establecimiento"
+                              >Establecimiento
+                              <span class="text-danger">*</span></label
+                            >
+                            <input
+                              type="text"
+                              id="cfg-establecimiento"
+                              class="form-control"
+                              placeholder="001"
+                              maxlength="10"
+                              pattern="^\d{1,10}$"
+                              required
+                            />
+                            <small class="form-text text-muted"
+                              >Solo números (ej: 001)</small
+                            >
+                            <div class="invalid-feedback">
+                              Solo se permiten números.
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6">
+                          <div class="form-group">
+                            <label for="cfg-punto-emision"
+                              >Punto de Emisión
+                              <span class="text-danger">*</span></label
+                            >
+                            <input
+                              type="text"
+                              id="cfg-punto-emision"
+                              class="form-control"
+                              placeholder="001"
+                              maxlength="10"
+                              pattern="^\d{1,10}$"
+                              required
+                            />
+                            <small class="form-text text-muted"
+                              >Solo números (ej: 001)</small
+                            >
+                            <div class="invalid-feedback">
+                              Solo se permiten números.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label>Secuencial actual</label>
+                        <div class="input-group">
+                          <input
+                            type="text"
+                            id="cfg-secuencial"
+                            class="form-control"
+                            readonly
+                          />
+                          <div class="input-group-append">
+                            <span class="input-group-text"
+                              ><i class="fas fa-lock"></i
+                            ></span>
+                          </div>
+                        </div>
+                        <small class="form-text text-muted"
+                          >Se incrementa automáticamente en cada venta. Solo
+                          lectura.</small
+                        >
+                      </div>
+                    </div>
+                    <div class="card-footer">
+                      <button
+                        type="submit"
+                        id="btn-guardar-config"
+                        class="btn btn-primary"
+                      >
+                        <i class="fas fa-save mr-1"></i> Guardar cambios
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -302,118 +328,11 @@
       </footer>
     </div>
 
-    <!-- Modal: Crear / Editar Mesa -->
-    <div class="modal fade" id="modal-mesa" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-header bg-primary">
-            <h5 class="modal-title" id="modal-mesa-title">Nueva Mesa</h5>
-            <button type="button" class="close text-white" data-dismiss="modal">
-              <span>&times;</span>
-            </button>
-          </div>
-          <form id="form-mesa" novalidate>
-            <div class="modal-body">
-              <input type="hidden" id="mesa-id" value="" />
-              <div class="form-group">
-                <label for="mesa-numero"
-                  >N° de Mesa <span class="text-danger">*</span></label
-                >
-                <input
-                  type="number"
-                  class="form-control"
-                  id="mesa-numero"
-                  placeholder="Ej: 6"
-                  min="1"
-                  required
-                />
-                <div class="invalid-feedback">
-                  El número de mesa es requerido y debe ser mayor a 0.
-                </div>
-              </div>
-              <div class="form-group" id="grupo-estado" style="display: none">
-                <label for="mesa-estado">Estado</label>
-                <select class="form-control" id="mesa-estado">
-                  <option value="libre">Libre</option>
-                  <option value="ocupada">Ocupada</option>
-                </select>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                class="btn btn-primary"
-                id="btn-guardar-mesa"
-              >
-                <i class="fas fa-save mr-1"></i> Guardar
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal: Confirmar Eliminar -->
-    <div
-      class="modal fade"
-      id="modal-confirmar-eliminar"
-      tabindex="-1"
-      role="dialog"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-header bg-danger">
-            <h5 class="modal-title text-white">Eliminar Mesa</h5>
-            <button type="button" class="close text-white" data-dismiss="modal">
-              <span>&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>
-              ¿Está seguro de eliminar la
-              <strong id="del-mesa-nombre"></strong>?
-            </p>
-            <p class="text-muted small">
-              Solo se puede eliminar si no tiene pedidos registrados.
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="btn-confirmar-eliminar"
-            >
-              <i class="fas fa-trash mr-1"></i> Eliminar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Scripts -->
     <script src="../plugins/jquery/jquery.min.js"></script>
     <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <script src="../dist/js/adminlte.js"></script>
-    <!-- DataTables -->
-    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <!-- POS Scripts -->
     <script src="../utils/api.js"></script>
-    <script src="../utils/mesas.js"></script>
+    <script src="../utils/configuracion.js"></script>
   </body>
 </html>
