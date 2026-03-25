@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pos Restaurante | Pedidos</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="../plugins/overlayScrollbars/css/OverlayScrollbars.min.css"
+    />
+    <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
+    <!-- DataTables -->
+    <link
+      rel="stylesheet"
+      href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css"
+    />
+  </head>
+  <body
+    class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed"
+  >
+    <div class="wrapper">
+      <!-- Preloader -->
+      <div
+        class="preloader flex-column justify-content-center align-items-center"
+      >
+        <img
+          class="animation__wobble"
+          src="../dist/img/AdminLTELogo.png"
+          alt="AdminLTELogo"
+          height="60"
+          width="60"
+        />
+      </div>
+
+      <!-- Navbar -->
+      <nav class="main-header navbar navbar-expand navbar-dark">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"
+              ><i class="fas fa-bars"></i
+            ></a>
+          </li>
+          <li class="nav-item d-none d-sm-inline-block">
+            <a href="index.html" class="nav-link">Inicio</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+              <i class="fas fa-expand-arrows-alt"></i>
+            </a>
+          </li>
+          <li class="nav-item dropdown user-menu">
+            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+              <i class="fas fa-user-circle fa-lg mr-1"></i>
+              <span class="d-none d-md-inline" id="nav-user-name">Usuario</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+              <li class="user-header bg-primary">
+                <i class="fas fa-user-circle fa-4x"></i>
+                <p>
+                  <span id="nav-user-name-header"></span>
+                  <small id="nav-user-role"></small>
+                </p>
+              </li>
+              <li class="user-footer">
+                <a href="#" id="btn-logout" class="btn btn-default btn-flat">
+                  <i class="fas fa-sign-out-alt mr-1"></i> Cerrar sesión
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar -->
+      <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a href="index.html" class="brand-link">
+          <img
+            src="../dist/img/AdminLTELogo.png"
+            alt="POS Logo"
+            class="brand-image img-circle elevation-3"
+            style="opacity: 0.8"
+          />
+          <span class="brand-text font-weight-light">POS Restaurante</span>
+        </a>
+        <div class="sidebar">
+          <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+              <i
+                class="fas fa-user-circle fa-2x text-white"
+                style="line-height: 2.2rem"
+              ></i>
+            </div>
+            <div class="info">
+              <span
+                id="sidebar-user-name"
+                class="d-block text-white"
+                style="font-size: 0.9rem"
+              ></span>
+              <small
+                id="sidebar-user-role"
+                class="text-light opacity-75"
+              ></small>
+            </div>
+          </div>
+          <nav class="mt-2">
+            <ul
+              class="nav nav-pills nav-sidebar flex-column"
+              data-widget="treeview"
+              role="menu"
+              data-accordion="false"
+            >
+              <li class="nav-item admin-only d-none">
+                <a href="index.html" class="nav-link"
+                  ><i class="nav-icon fas fa-tachometer-alt"></i>
+                  <p>Dashboard</p></a
+                >
+              </li>
+              <li class="nav-item admin-only d-none">
+                <a href="mesas.html" class="nav-link"
+                  ><i class="nav-icon fas fa-chair"></i>
+                  <p>Mesas</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="pedidos.html" class="nav-link active"
+                  ><i class="nav-icon fas fa-clipboard-list"></i>
+                  <p>Pedidos</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="ventas.html" class="nav-link"
+                  ><i class="nav-icon fas fa-cash-register"></i>
+                  <p>Ventas / Caja</p></a
+                >
+              </li>
+              <li class="nav-header admin-only d-none">CATÁLOGO</li>
+              <li class="nav-item admin-only d-none">
+                <a href="categorias.html" class="nav-link"
+                  ><i class="nav-icon fas fa-tags"></i>
+                  <p>Categorías</p></a
+                >
+              </li>
+              <li class="nav-item admin-only d-none">
+                <a href="productos.html" class="nav-link"
+                  ><i class="nav-icon fas fa-utensils"></i>
+                  <p>Productos</p></a
+                >
+              </li>
+              <li class="nav-header admin-only d-none">INVENTARIO</li>
+              <li class="nav-item admin-only d-none">
+                <a href="insumos.html" class="nav-link"
+                  ><i class="nav-icon fas fa-boxes"></i>
+                  <p>Insumos</p></a
+                >
+              </li>
+              <li class="nav-item admin-only d-none">
+                <a href="recetas.html" class="nav-link"
+                  ><i class="nav-icon fas fa-book-open"></i>
+                  <p>Recetas</p></a
+                >
+              </li>
+              <li class="nav-header admin-only d-none">ADMINISTRACIÓN</li>
+              <li class="nav-item admin-only d-none">
+                <a href="usuarios.html" class="nav-link"
+                  ><i class="nav-icon fas fa-users-cog"></i>
+                  <p>Usuarios</p></a
+                >
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Content Wrapper -->
+      <div class="content-wrapper">
+        <div class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6"><h1 class="m-0">Pedidos</h1></div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item">
+                    <a href="index.html">Inicio</a>
+                  </li>
+                  <li class="breadcrumb-item active">Pedidos</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="content">
+          <div class="container-fluid">
+            <!-- Alert -->
+            <div id="alert-box" class="d-none"></div>
+
+            <!-- Stats -->
+            <div class="row mb-3">
+              <div class="col-6 col-md-3">
+                <div class="info-box">
+                  <span class="info-box-icon bg-warning elevation-1"
+                    ><i class="fas fa-clock"></i
+                  ></span>
+                  <div class="info-box-content">
+                    <span class="info-box-text">Abiertos</span>
+                    <span class="info-box-number" id="stat-abiertos">—</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="info-box">
+                  <span class="info-box-icon bg-success elevation-1"
+                    ><i class="fas fa-check-circle"></i
+                  ></span>
+                  <div class="info-box-content">
+                    <span class="info-box-text">Cerrados</span>
+                    <span class="info-box-number" id="stat-cerrados">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Tabla -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-clipboard-list mr-2"></i>Listado de Pedidos
+                </h3>
+                <div class="card-tools d-flex align-items-center">
+                  <!-- Filtros de estado -->
+                  <div class="btn-group btn-group-sm mr-2" role="group">
+                    <button
+                      id="btn-filtro-todos"
+                      class="btn btn-secondary active"
+                      onclick="setFiltro(null)"
+                    >
+                      Todos
+                    </button>
+                    <button
+                      id="btn-filtro-abiertos"
+                      class="btn btn-secondary"
+                      onclick="setFiltro('abierto')"
+                    >
+                      Abiertos
+                    </button>
+                    <button
+                      id="btn-filtro-cerrados"
+                      class="btn btn-secondary"
+                      onclick="setFiltro('cerrado')"
+                    >
+                      Cerrados
+                    </button>
+                  </div>
+                  <button id="btn-nuevo-pedido" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus mr-1"></i> Nuevo Pedido
+                  </button>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table
+                    id="table-pedidos"
+                    class="table table-hover table-striped m-0"
+                    style="width: 100%"
+                  >
+                    <thead>
+                      <tr>
+                        <th style="width: 50px">#</th>
+                        <th style="width: 80px">Mesa</th>
+                        <th>Atendido por</th>
+                        <th style="width: 110px">Total</th>
+                        <th style="width: 100px">Estado</th>
+                        <th style="width: 150px">Fecha</th>
+                        <th class="text-center" style="width: 110px">
+                          Acciones
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody-pedidos">
+                      <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                          <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="main-footer">
+        <strong>POS Restaurante</strong> &mdash; Sistema de Punto de Venta
+        <div class="float-right d-none d-sm-inline-block">
+          <b>Version</b> 1.0.0
+        </div>
+      </footer>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         Modal: Nuevo Pedido
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="modal fade" id="modal-nuevo-pedido" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-primary">
+            <h5 class="modal-title">
+              <i class="fas fa-plus mr-2"></i>Nuevo Pedido
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <form id="form-nuevo-pedido" novalidate>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="pedido-mesa"
+                  >Mesa <span class="text-danger">*</span></label
+                >
+                <select id="pedido-mesa" class="form-control" required>
+                  <option value="">— Seleccione una mesa libre —</option>
+                </select>
+                <small class="form-text text-muted">
+                  Solo se muestran las mesas disponibles.
+                </small>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check mr-1"></i> Crear Pedido
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         Modal: Ver / Gestionar Pedido
+    ══════════════════════════════════════════════════════════════════ -->
+    <div
+      class="modal fade"
+      id="modal-ver-pedido"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="static"
+    >
+      <div
+        class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+        role="document"
+      >
+        <div class="modal-content">
+          <div class="modal-header bg-info">
+            <h5 class="modal-title" id="modal-ver-pedido-title">
+              <i class="fas fa-receipt mr-2"></i>Pedido
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- Resumen del pedido -->
+            <div class="row mb-3">
+              <div class="col-6">
+                <small class="text-muted">Mesa</small>
+                <div class="font-weight-bold" id="ver-mesa">—</div>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Atendido por</small>
+                <div class="font-weight-bold" id="ver-mesero">—</div>
+              </div>
+              <div class="col-6 mt-2">
+                <small class="text-muted">Estado</small>
+                <div id="ver-estado">—</div>
+              </div>
+              <div class="col-6 mt-2">
+                <small class="text-muted">Total</small>
+                <div
+                  class="font-weight-bold text-success h5 mb-0"
+                  id="ver-total"
+                >
+                  —
+                </div>
+              </div>
+            </div>
+
+            <hr />
+
+            <!-- Tabla de ítems -->
+            <h6 class="mb-2">
+              <i class="fas fa-list mr-1"></i> Ítems del pedido
+            </h6>
+            <div class="table-responsive mb-3">
+              <table class="table table-sm table-bordered m-0">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Producto</th>
+                    <th class="text-center" style="width: 80px">Cant.</th>
+                    <th class="text-right" style="width: 100px">Precio</th>
+                    <th class="text-right" style="width: 110px">Subtotal</th>
+                    <th
+                      id="col-quitar-header"
+                      class="text-center"
+                      style="width: 60px"
+                    >
+                      Quitar
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-detalle">
+                  <tr>
+                    <td colspan="5" class="text-center text-muted py-3">
+                      Sin ítems
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Formulario agregar ítem (solo pedidos abiertos) -->
+            <div id="form-agregar-item-wrapper">
+              <h6 class="mb-2">
+                <i class="fas fa-plus-circle mr-1"></i> Agregar ítem
+              </h6>
+              <form id="form-agregar-item" novalidate>
+                <div class="row">
+                  <div class="col-sm-7">
+                    <div class="form-group mb-2">
+                      <select
+                        id="item-producto"
+                        class="form-control form-control-sm"
+                        required
+                      >
+                        <option value="">— Seleccione producto —</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="form-group mb-2">
+                      <input
+                        type="number"
+                        id="item-cantidad"
+                        class="form-control form-control-sm"
+                        placeholder="Cant."
+                        min="1"
+                        step="1"
+                        value="1"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <button type="submit" class="btn btn-success btn-sm w-100">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="modal-footer d-flex justify-content-between">
+            <div id="btn-cerrar-pedido-wrapper">
+              <button
+                id="btn-cerrar-pedido"
+                class="btn btn-warning admin-only"
+                onclick="confirmarCerrarPedido()"
+              >
+                <i class="fas fa-lock mr-1"></i> Cerrar Pedido
+              </button>
+            </div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         Modal: Confirmar cerrar pedido
+    ══════════════════════════════════════════════════════════════════ -->
+    <div
+      class="modal fade"
+      id="modal-confirmar-cerrar"
+      tabindex="-1"
+      role="dialog"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-warning">
+            <h5 class="modal-title">
+              <i class="fas fa-lock mr-2"></i>Cerrar Pedido
+            </h5>
+            <button type="button" class="close" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              ¿Confirma que desea cerrar el pedido
+              <strong id="confirmar-pedido-ref"></strong>?
+            </p>
+            <p class="text-muted small">
+              La mesa quedará libre y se generará la venta correspondiente.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              data-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-warning btn-sm"
+              id="btn-confirmar-cerrar"
+            >
+              <i class="fas fa-check mr-1"></i> Sí, cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         Modal: Confirmar quitar ítem
+    ══════════════════════════════════════════════════════════════════ -->
+    <div
+      class="modal fade"
+      id="modal-confirmar-quitar"
+      tabindex="-1"
+      role="dialog"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-danger">
+            <h5 class="modal-title text-white">
+              <i class="fas fa-trash mr-2"></i>Quitar ítem
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              ¿Desea quitar
+              <strong id="confirmar-item-nombre"></strong>
+              del pedido?
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              data-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              id="btn-confirmar-quitar"
+            >
+              <i class="fas fa-trash mr-1"></i> Quitar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../plugins/jquery/jquery.min.js"></script>
+    <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="../dist/js/adminlte.min.js"></script>
+    <!-- DataTables -->
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- App -->
+    <script src="../utils/api.js"></script>
+    <script src="../utils/pedidos.js"></script>
+  </body>
+</html>

@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pos Restaurante | Insumos</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="../plugins/overlayScrollbars/css/OverlayScrollbars.min.css"
+    />
+    <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
+    <!-- DataTables -->
+    <link
+      rel="stylesheet"
+      href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css"
+    />
+  </head>
+  <body
+    class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed"
+  >
+    <div class="wrapper">
+      <!-- Preloader -->
+      <div
+        class="preloader flex-column justify-content-center align-items-center"
+      >
+        <img
+          class="animation__wobble"
+          src="../dist/img/AdminLTELogo.png"
+          alt="AdminLTELogo"
+          height="60"
+          width="60"
+        />
+      </div>
+
+      <!-- Navbar -->
+      <nav class="main-header navbar navbar-expand navbar-dark">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"
+              ><i class="fas fa-bars"></i
+            ></a>
+          </li>
+          <li class="nav-item d-none d-sm-inline-block">
+            <a href="index.html" class="nav-link">Inicio</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+              <i class="fas fa-expand-arrows-alt"></i>
+            </a>
+          </li>
+          <li class="nav-item dropdown user-menu">
+            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+              <i class="fas fa-user-circle fa-lg mr-1"></i>
+              <span class="d-none d-md-inline" id="nav-user-name">Usuario</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+              <li class="user-header bg-primary">
+                <i class="fas fa-user-circle fa-4x"></i>
+                <p>
+                  <span id="nav-user-name-header"></span>
+                  <small id="nav-user-role"></small>
+                </p>
+              </li>
+              <li class="user-footer">
+                <a href="#" id="btn-logout" class="btn btn-default btn-flat">
+                  <i class="fas fa-sign-out-alt mr-1"></i> Cerrar sesión
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar -->
+      <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a href="index.html" class="brand-link">
+          <img
+            src="../dist/img/AdminLTELogo.png"
+            alt="POS Logo"
+            class="brand-image img-circle elevation-3"
+            style="opacity: 0.8"
+          />
+          <span class="brand-text font-weight-light">POS Restaurante</span>
+        </a>
+        <div class="sidebar">
+          <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+              <i
+                class="fas fa-user-circle fa-2x text-white"
+                style="line-height: 2.2rem"
+              ></i>
+            </div>
+            <div class="info">
+              <span
+                id="sidebar-user-name"
+                class="d-block text-white"
+                style="font-size: 0.9rem"
+              ></span>
+              <small
+                id="sidebar-user-role"
+                class="text-light opacity-75"
+              ></small>
+            </div>
+          </div>
+          <nav class="mt-2">
+            <ul
+              class="nav nav-pills nav-sidebar flex-column"
+              data-widget="treeview"
+              role="menu"
+              data-accordion="false"
+            >
+              <li class="nav-item">
+                <a href="index.html" class="nav-link"
+                  ><i class="nav-icon fas fa-tachometer-alt"></i>
+                  <p>Dashboard</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="mesas.html" class="nav-link"
+                  ><i class="nav-icon fas fa-chair"></i>
+                  <p>Mesas</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="pedidos.html" class="nav-link"
+                  ><i class="nav-icon fas fa-clipboard-list"></i>
+                  <p>Pedidos</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="ventas.html" class="nav-link"
+                  ><i class="nav-icon fas fa-cash-register"></i>
+                  <p>Ventas / Caja</p></a
+                >
+              </li>
+              <li class="nav-header">CATÁLOGO</li>
+              <li class="nav-item">
+                <a href="categorias.html" class="nav-link"
+                  ><i class="nav-icon fas fa-tags"></i>
+                  <p>Categorías</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="productos.html" class="nav-link"
+                  ><i class="nav-icon fas fa-utensils"></i>
+                  <p>Productos</p></a
+                >
+              </li>
+              <li class="nav-header">INVENTARIO</li>
+              <li class="nav-item">
+                <a href="insumos.html" class="nav-link active"
+                  ><i class="nav-icon fas fa-boxes"></i>
+                  <p>Insumos</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="recetas.html" class="nav-link"
+                  ><i class="nav-icon fas fa-book-open"></i>
+                  <p>Recetas</p></a
+                >
+              </li>
+              <li class="nav-header admin-only" style="display: none">
+                ADMINISTRACIÓN
+              </li>
+              <li class="nav-item admin-only" style="display: none">
+                <a href="usuarios.html" class="nav-link"
+                  ><i class="nav-icon fas fa-users-cog"></i>
+                  <p>Usuarios</p></a
+                >
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Content Wrapper -->
+      <div class="content-wrapper">
+        <div class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6"><h1 class="m-0">Insumos</h1></div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item">
+                    <a href="index.html">Inicio</a>
+                  </li>
+                  <li class="breadcrumb-item active">Insumos</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="content">
+          <div class="container-fluid">
+            <!-- Alert -->
+            <div id="alert-box" class="d-none"></div>
+
+            <!-- Estadísticas -->
+            <div class="row mb-3">
+              <div class="col-6 col-md-3">
+                <div class="info-box">
+                  <span class="info-box-icon bg-info elevation-1"
+                    ><i class="fas fa-boxes"></i
+                  ></span>
+                  <div class="info-box-content">
+                    <span class="info-box-text">Total Insumos</span>
+                    <span class="info-box-number" id="stat-total">—</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="info-box">
+                  <span class="info-box-icon bg-danger elevation-1"
+                    ><i class="fas fa-exclamation-triangle"></i
+                  ></span>
+                  <div class="info-box-content">
+                    <span class="info-box-text">Sin Stock</span>
+                    <span class="info-box-number" id="stat-sin-stock">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card tabla -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-boxes mr-2"></i>Listado de Insumos
+                </h3>
+                <div class="card-tools">
+                  <button
+                    id="btn-nuevo-insumo"
+                    class="btn btn-primary btn-sm admin-only"
+                    style="display: none"
+                  >
+                    <i class="fas fa-plus mr-1"></i> Nuevo Insumo
+                  </button>
+                </div>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table
+                    id="table-insumos"
+                    class="table table-hover table-striped m-0"
+                    style="width: 100%"
+                  >
+                    <thead>
+                      <tr>
+                        <th style="width: 50px">#</th>
+                        <th>Nombre</th>
+                        <th style="width: 110px">Unidad</th>
+                        <th style="width: 120px">Stock</th>
+                        <th
+                          class="admin-only text-center"
+                          style="width: 120px; display: none"
+                        >
+                          Acciones
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody-insumos">
+                      <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                          <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="main-footer">
+        <strong>POS Restaurante</strong> &mdash; Sistema de Punto de Venta
+        <div class="float-right d-none d-sm-inline-block">
+          <b>Version</b> 1.0.0
+        </div>
+      </footer>
+    </div>
+
+    <!-- Modal: Crear / Editar Insumo -->
+    <div class="modal fade" id="modal-insumo" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-primary">
+            <h5 class="modal-title" id="modal-insumo-title">Nuevo Insumo</h5>
+            <button type="button" class="close text-white" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <form id="form-insumo" novalidate>
+            <div class="modal-body">
+              <input type="hidden" id="insumo-id" />
+
+              <div class="form-group">
+                <label for="insumo-nombre"
+                  >Nombre <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  id="insumo-nombre"
+                  class="form-control"
+                  placeholder="Ej: Harina de trigo"
+                  maxlength="100"
+                  required
+                />
+                <div class="invalid-feedback">El nombre es requerido.</div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="insumo-unidad"
+                      >Unidad <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      id="insumo-unidad"
+                      class="form-control"
+                      placeholder="Ej: kg, L, unidad"
+                      maxlength="20"
+                      list="lista-unidades"
+                      required
+                    />
+                    <datalist id="lista-unidades">
+                      <option value="kg"></option>
+                      <option value="g"></option>
+                      <option value="L"></option>
+                      <option value="ml"></option>
+                      <option value="unidad"></option>
+                      <option value="docena"></option>
+                      <option value="porción"></option>
+                    </datalist>
+                    <div class="invalid-feedback">La unidad es requerida.</div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="insumo-stock">Stock</label>
+                    <input
+                      type="number"
+                      id="insumo-stock"
+                      class="form-control"
+                      placeholder="0"
+                      min="0"
+                      step="0.001"
+                      value="0"
+                    />
+                    <div class="invalid-feedback">
+                      El stock debe ser un número positivo.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                <i class="fas fa-times mr-1"></i> Cancelar
+              </button>
+              <button
+                type="submit"
+                id="btn-guardar-insumo"
+                class="btn btn-primary"
+              >
+                <i class="fas fa-save mr-1"></i> Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Confirmar Eliminar -->
+    <div
+      class="modal fade"
+      id="modal-confirmar-eliminar"
+      tabindex="-1"
+      role="dialog"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-danger">
+            <h5 class="modal-title">Confirmar eliminación</h5>
+            <button type="button" class="close text-white" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body text-center">
+            <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+            <p>
+              ¿Eliminar insumo
+              <strong id="del-insumo-nombre"></strong>?
+            </p>
+            <p class="text-muted small">Esta acción no se puede deshacer.</p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              id="btn-confirmar-eliminar"
+              class="btn btn-danger"
+            >
+              <i class="fas fa-trash mr-1"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../plugins/jquery/jquery.min.js"></script>
+    <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="../dist/js/adminlte.min.js"></script>
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="../utils/api.js"></script>
+    <script src="../utils/insumos.js"></script>
+  </body>
+</html>

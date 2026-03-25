@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acceso no autorizado | POS Restaurante</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
+    <style>
+      body {
+        background: #1a1a2e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .error-card {
+        background: #1e1e2e;
+        border: 1px solid #343a40;
+        border-radius: 12px;
+        padding: 3rem 2.5rem;
+        max-width: 480px;
+        width: 100%;
+        text-align: center;
+        color: #fff;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      .error-icon {
+        font-size: 4.5rem;
+        color: #ffc107;
+        margin-bottom: 1.5rem;
+      }
+      .error-code {
+        font-size: 5rem;
+        font-weight: 700;
+        color: #ffc107;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+      }
+      .error-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+      .error-desc {
+        color: #adb5bd;
+        margin-bottom: 1.75rem;
+        font-size: 0.95rem;
+      }
+      .countdown-text {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-top: 1.25rem;
+      }
+      .countdown-text span {
+        color: #ffc107;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="error-card">
+      <div class="error-icon">
+        <i class="fas fa-lock"></i>
+      </div>
+      <div class="error-code">403</div>
+      <div class="error-title">Acceso no autorizado</div>
+      <p class="error-desc">
+        No tienes permisos para acceder a esta sección.<br />
+        Si crees que esto es un error, contacta al administrador.
+      </p>
+      <a id="btn-back" href="#" class="btn btn-warning btn-lg w-100">
+        <i class="fas fa-arrow-left mr-2"></i> Volver al inicio
+      </a>
+      <p class="countdown-text">
+        Redirigiendo en <span id="countdown">5</span> segundos…
+      </p>
+    </div>
+
+    <script src="../utils/api.js"></script>
+    <script>
+      // Destino según rol del usuario logueado
+      var user = getUser();
+      var home = user && user.rol === "admin" ? "index.html" : "pedidos.html";
+
+      document.getElementById("btn-back").href = home;
+
+      // Cuenta regresiva y redirección automática
+      var secs = 5;
+      var countEl = document.getElementById("countdown");
+      var timer = setInterval(function () {
+        secs--;
+        countEl.textContent = secs;
+        if (secs <= 0) {
+          clearInterval(timer);
+          window.location.href = home;
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+# Página de error 404 personalizada
+ErrorDocument 404 /pos_restaurante/frontend/src/404.html
+
+# Deshabilitar bfcache para todas las páginas HTML protegidas.
+# Esto evita que el navegador restaure páginas antiguas al presionar "atrás".
+<FilesMatch "\.html$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</FilesMatch>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Página no encontrada | POS Restaurante</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
+    <style>
+      body {
+        background: #1a1a2e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .error-card {
+        background: #1e1e2e;
+        border: 1px solid #343a40;
+        border-radius: 12px;
+        padding: 3rem 2.5rem;
+        max-width: 480px;
+        width: 100%;
+        text-align: center;
+        color: #fff;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      .error-icon {
+        font-size: 4.5rem;
+        color: #dc3545;
+        margin-bottom: 1.5rem;
+      }
+      .error-code {
+        font-size: 5rem;
+        font-weight: 700;
+        color: #dc3545;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+      }
+      .error-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+      .error-desc {
+        color: #adb5bd;
+        margin-bottom: 1.75rem;
+        font-size: 0.95rem;
+      }
+      .countdown-text {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-top: 1.25rem;
+      }
+      .countdown-text span {
+        color: #dc3545;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="error-card">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="error-code">404</div>
+      <div class="error-title">Página no encontrada</div>
+      <p class="error-desc">
+        La dirección que ingresaste no existe.<br />
+        Verifica la URL o regresa al inicio.
+      </p>
+      <a id="btn-back" href="login.html" class="btn btn-danger btn-lg w-100">
+        <i class="fas fa-home mr-2"></i> Ir al inicio
+      </a>
+      <p class="countdown-text">
+        Redirigiendo en <span id="countdown">5</span> segundos…
+      </p>
+    </div>
+
+    <script src="../utils/api.js"></script>
+    <script>
+      var user = getUser();
+      var home = user
+        ? user.rol === "admin"
+          ? "index.html"
+          : "pedidos.html"
+        : "login.html";
+
+      document.getElementById("btn-back").href = home;
+
+      var secs = 5;
+      var countEl = document.getElementById("countdown");
+      var timer = setInterval(function () {
+        secs--;
+        countEl.textContent = secs;
+        if (secs <= 0) {
+          clearInterval(timer);
+          window.location.href = home;
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>
