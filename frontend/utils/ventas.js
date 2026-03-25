@@ -2,6 +2,7 @@
 
 var _isAdmin = false;
 var _reporteCargado = false;
+var _currentVenta = null;
 
 document.addEventListener("DOMContentLoaded", function () {
   redirectIfNotLoggedIn();
@@ -41,6 +42,11 @@ document.addEventListener("DOMContentLoaded", function () {
     registrarCobro();
   });
 
+  // ── Descargar factura PDF ─────────────────────────────────────────────
+  el("btn-descargar-factura").addEventListener("click", function () {
+    generarFacturaPDF();
+  });
+
   // ── Reporte (admin) ───────────────────────────────────────────────────
   if (_isAdmin) {
     // Establecer fechas por defecto: hoy (usando fecha local, no UTC)
@@ -60,8 +66,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Inicializar tabla vacía (limpiar tbody para evitar error _DT_CellIndex)
     document.getElementById("tbody-ventas").innerHTML = "";
-    initDataTable("#table-ventas", 7);
+    initDataTable("#table-ventas", 8);
     _reporteCargado = true;
+
+    // Delegar click en botones PDF del reporte
+    document
+      .getElementById("tbody-ventas")
+      .addEventListener("click", function (e) {
+        var btn = e.target.closest(".btn-pdf-reporte");
+        if (!btn) return;
+        var ventaData = {
+          id: btn.dataset.ventaId,
+          pedido_id: btn.dataset.pedidoId,
+          numero_factura: btn.dataset.factura,
+          total: btn.dataset.total,
+          cliente_nombre: btn.dataset.cliente,
+          cliente_ci_nit: btn.dataset.ci,
+          cliente_telefono: btn.dataset.telefono,
+          cliente_email: btn.dataset.email,
+          metodo_pago: btn.dataset.metodo,
+        };
+        _currentVenta = ventaData;
+        generarFacturaPDF();
+      });
   }
 
   // ── Cargar pedidos abiertos ───────────────────────────────────────────
@@ -197,6 +224,7 @@ async function registrarCobro() {
     };
     document.getElementById("comp-metodo").textContent =
       metodosLabel[venta.metodo_pago] || venta.metodo_pago || "—";
+    _currentVenta = venta;
     $("#modal-comprobante").modal("show");
 
     // Recargar pedidos abiertos
@@ -313,6 +341,35 @@ async function loadReporte() {
           "<td>" +
           escapeHtml(fecha) +
           "</td>" +
+          '<td class="text-center"><button class="btn btn-xs btn-outline-primary btn-pdf-reporte" ' +
+          'data-venta-id="' +
+          v.id +
+          '" ' +
+          'data-pedido-id="' +
+          (v.pedido_id || "") +
+          '" ' +
+          'data-factura="' +
+          escapeHtml(v.numero_factura || "") +
+          '" ' +
+          'data-total="' +
+          parseFloat(v.total || 0).toFixed(2) +
+          '" ' +
+          'data-cliente="' +
+          escapeHtml(v.cliente_nombre || "Consumidor Final") +
+          '" ' +
+          'data-ci="' +
+          escapeHtml(v.cliente_ci_nit || "") +
+          '" ' +
+          'data-telefono="' +
+          escapeHtml(v.cliente_telefono || "") +
+          '" ' +
+          'data-email="' +
+          escapeHtml(v.cliente_email || "") +
+          '" ' +
+          'data-metodo="' +
+          escapeHtml(v.metodo_pago || "") +
+          '" ' +
+          'title="Ver Factura PDF"><i class="fas fa-file-pdf"></i></button></td>' +
           "</tr>"
         );
       })
@@ -320,7 +377,7 @@ async function loadReporte() {
 
     if (ventas.length === 0) tbody.innerHTML = "";
 
-    initDataTable("#table-ventas", 7);
+    initDataTable("#table-ventas", 8);
     _reporteCargado = true;
   } catch (err) {
     console.error("[loadReporte]", err);
@@ -330,7 +387,7 @@ async function loadReporte() {
       "Error al cargar el reporte.";
     showAlert("danger", msg);
     tbody.innerHTML = "";
-    initDataTable("#table-ventas", 7);
+    initDataTable("#table-ventas", 8);
   }
 }
 
@@ -578,4 +635,360 @@ async function _guardarNuevoClienteCobrar() {
 function _getClienteIdCobrar() {
   var val = document.getElementById("cobrar-cliente-id").value;
   return val ? parseInt(val, 10) : null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Generar factura PDF (pdfmake local)
+// ═══════════════════════════════════════════════════════════════════════
+async function generarFacturaPDF() {
+  if (!_currentVenta) return;
+
+  var btn = document.getElementById("btn-descargar-factura");
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Generando...';
+
+  try {
+    var empResp = await EmpresaAPI.get();
+    var empresa = empResp.data || {};
+
+    var pedResp = await PedidosAPI.getById(_currentVenta.pedido_id);
+    var pedido = pedResp.data || {};
+    var detalle = pedido.detalle || [];
+
+    // Cargar logo como base64
+    var logoBase64 = null;
+    try {
+      var logoResp = await fetch("../dist/img/logoempresa.png");
+      if (logoResp.ok) {
+        var logoBlob = await logoResp.blob();
+        logoBase64 = await new Promise(function (resolve) {
+          var reader = new FileReader();
+          reader.onloadend = function () {
+            resolve(reader.result);
+          };
+          reader.readAsDataURL(logoBlob);
+        });
+      }
+    } catch (_) {
+      /* logo opcional, continúa sin él */
+    }
+
+    var metodosLabel = {
+      efectivo: "Efectivo",
+      tarjeta: "Tarjeta",
+      transferencia: "Transferencia",
+    };
+    var fechaVenta = new Date().toLocaleDateString("es-EC");
+    var total = parseFloat(_currentVenta.total || 0).toFixed(2);
+
+    var productoRows = detalle.map(function (item) {
+      return [
+        { text: String(item.producto_id || ""), fontSize: 9 },
+        { text: String(item.cantidad), fontSize: 9, alignment: "center" },
+        { text: item.producto_nombre || "—", fontSize: 9 },
+        {
+          text: "$" + parseFloat(item.precio || 0).toFixed(2),
+          fontSize: 9,
+          alignment: "right",
+        },
+        { text: "$0.00", fontSize: 9, alignment: "right" },
+        {
+          text: "$" + parseFloat(item.subtotal || 0).toFixed(2),
+          fontSize: 9,
+          alignment: "right",
+        },
+      ];
+    });
+
+    var docDefinition = {
+      pageSize: "A4",
+      pageMargins: [40, 40, 40, 60],
+      content: [
+        // ── Encabezado: logo izquierda | datos empresa + factura derecha ─
+        {
+          columns: [
+            // Izquierda: solo logo
+            logoBase64
+              ? { image: logoBase64, width: 150, margin: [0, -20, 0, 0] }
+              : { text: "", width: 10 },
+            // Derecha: nombre, RUC, dirección, tel, correo, FACTURA, No.
+            {
+              width: "*",
+              alignment: "right",
+              margin: [16, 0, 0, 0],
+              stack: [
+                {
+                  text: empresa.nombre || "Mi Empresa",
+                  fontSize: 16,
+                  bold: true,
+                  color: "#222",
+                },
+                empresa.ruc
+                  ? { text: "RUC: " + empresa.ruc, fontSize: 9, color: "#555" }
+                  : {},
+                empresa.direccion
+                  ? { text: empresa.direccion, fontSize: 9, color: "#555" }
+                  : {},
+                empresa.telefono
+                  ? {
+                      text: "Tel: " + empresa.telefono,
+                      fontSize: 9,
+                      color: "#555",
+                    }
+                  : {},
+                empresa.correo
+                  ? { text: empresa.correo, fontSize: 9, color: "#555" }
+                  : {},
+                {
+                  text: "FACTURA",
+                  fontSize: 22,
+                  bold: true,
+                  color: "#1a56db",
+                  margin: [0, 6, 0, 0],
+                },
+                {
+                  text: "No. " + (_currentVenta.numero_factura || ""),
+                  fontSize: 11,
+                  bold: true,
+                },
+              ],
+            },
+          ],
+          margin: [0, 0, 0, 10],
+        },
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: "#dee2e6",
+            },
+          ],
+          margin: [0, 0, 0, 8],
+        },
+        // ── Datos del cliente ────────────────────────────────────────────
+        {
+          table: {
+            widths: ["*", "*", "*"],
+            body: [
+              [
+                {
+                  text: [
+                    { text: "Razón Social: ", bold: true },
+                    _currentVenta.cliente_nombre || "Consumidor Final",
+                  ],
+                  fontSize: 9,
+                },
+                {
+                  text: [
+                    { text: "RUC / CI: ", bold: true },
+                    _currentVenta.cliente_ci_nit || "—",
+                  ],
+                  fontSize: 9,
+                },
+                {
+                  text: [
+                    { text: "Condición de Pago: ", bold: true },
+                    metodosLabel[_currentVenta.metodo_pago] ||
+                      _currentVenta.metodo_pago ||
+                      "—",
+                  ],
+                  fontSize: 9,
+                },
+              ],
+              [
+                {
+                  text: [
+                    { text: "Teléfono: ", bold: true },
+                    _currentVenta.cliente_telefono || "—",
+                  ],
+                  fontSize: 9,
+                },
+                {
+                  text: [{ text: "Fecha: ", bold: true }, fechaVenta],
+                  fontSize: 9,
+                },
+                {
+                  text: [
+                    { text: "Email: ", bold: true },
+                    _currentVenta.cliente_email || "—",
+                  ],
+                  fontSize: 9,
+                },
+              ],
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 10],
+        },
+        // ── Tabla de productos ───────────────────────────────────────────
+        {
+          table: {
+            headerRows: 1,
+            widths: [45, 30, "*", 65, 60, 65],
+            body: [
+              [
+                {
+                  text: "Cód.",
+                  bold: true,
+                  fontSize: 9,
+                  fillColor: "#f1f3f5",
+                },
+                {
+                  text: "Cant.",
+                  bold: true,
+                  fontSize: 9,
+                  fillColor: "#f1f3f5",
+                  alignment: "center",
+                },
+                {
+                  text: "Descripción",
+                  bold: true,
+                  fontSize: 9,
+                  fillColor: "#f1f3f5",
+                },
+                {
+                  text: "P. Unitario",
+                  bold: true,
+                  fontSize: 9,
+                  fillColor: "#f1f3f5",
+                  alignment: "right",
+                },
+                {
+                  text: "Descuento",
+                  bold: true,
+                  fontSize: 9,
+                  fillColor: "#f1f3f5",
+                  alignment: "right",
+                },
+                {
+                  text: "P. Total",
+                  bold: true,
+                  fontSize: 9,
+                  fillColor: "#f1f3f5",
+                  alignment: "right",
+                },
+              ],
+            ].concat(
+              productoRows.length
+                ? productoRows
+                : [
+                    [
+                      {
+                        text: "Sin productos",
+                        colSpan: 6,
+                        alignment: "center",
+                        fontSize: 9,
+                        color: "#999",
+                      },
+                      {},
+                      {},
+                      {},
+                      {},
+                      {},
+                    ],
+                  ],
+            ),
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 10],
+        },
+        // ── Totales ──────────────────────────────────────────────────────
+        {
+          columns: [
+            { width: "*", text: "" },
+            {
+              width: 210,
+              table: {
+                widths: ["*", 80],
+                body: [
+                  [
+                    { text: "Subtotal sin impuestos", fontSize: 9, bold: true },
+                    {
+                      text: "$" + total,
+                      fontSize: 9,
+                      alignment: "right",
+                    },
+                  ],
+                  [
+                    {
+                      text: "Subtotal Exento IVA",
+                      fontSize: 9,
+                      bold: true,
+                    },
+                    { text: "$0.00", fontSize: 9, alignment: "right" },
+                  ],
+                  [
+                    { text: "Descuento 0%", fontSize: 9, bold: true },
+                    { text: "$0.00", fontSize: 9, alignment: "right" },
+                  ],
+                  [
+                    { text: "ICE", fontSize: 9, bold: true },
+                    { text: "$0.00", fontSize: 9, alignment: "right" },
+                  ],
+                  [
+                    { text: "IVA 0.00%", fontSize: 9, bold: true },
+                    { text: "$0.00", fontSize: 9, alignment: "right" },
+                  ],
+                  [
+                    {
+                      text: "VALOR TOTAL",
+                      fontSize: 10,
+                      bold: true,
+                    },
+                    {
+                      text: "$" + total,
+                      fontSize: 10,
+                      bold: true,
+                      color: "#1a56db",
+                      alignment: "right",
+                    },
+                  ],
+                ],
+              },
+              layout: "lightHorizontalLines",
+            },
+          ],
+          margin: [0, 0, 0, 16],
+        },
+        // ── Pie de página ────────────────────────────────────────────────
+        {
+          text: "TÉRMINOS Y CONDICIONES",
+          fontSize: 9,
+          bold: true,
+          alignment: "center",
+          margin: [0, 0, 0, 3],
+        },
+        {
+          text: "El proveedor declara que los bienes o servicios entregados cumplen con las especificaciones acordadas. Este documento es válido como comprobante de pago.",
+          fontSize: 8,
+          color: "#6c757d",
+          alignment: "center",
+        },
+        {
+          text: "Copyright@ SolucionesITEC",
+          fontSize: 8,
+          color: "#6c757d",
+          alignment: "center",
+          margin: [0, 4, 0, 0],
+        },
+      ],
+      defaultStyle: {
+        font: "Roboto",
+        fontSize: 10,
+      },
+    };
+
+    pdfMake.createPdf(docDefinition).open();
+  } catch (err) {
+    console.error("[generarFacturaPDF]", err);
+    showAlert("danger", "Error al generar el PDF de la factura.");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-file-pdf mr-1"></i> Descargar Factura';
+  }
 }

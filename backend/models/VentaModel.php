@@ -18,6 +18,7 @@ class VentaModel
     return $this->db->query("
             SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
                    c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit,
+                   c.telefono AS cliente_telefono, c.email AS cliente_email,
                    v.numero_factura
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id
@@ -33,6 +34,7 @@ class VentaModel
     $stmt = $this->db->prepare("
             SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
                    c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit,
+                   c.telefono AS cliente_telefono, c.email AS cliente_email,
                    v.numero_factura
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id
@@ -81,6 +83,7 @@ class VentaModel
     $stmt = $this->db->prepare("
             SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
                    c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit,
+                   c.telefono AS cliente_telefono, c.email AS cliente_email,
                    v.numero_factura
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id

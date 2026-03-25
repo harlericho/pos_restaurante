@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pos Restaurante | Mesas</title>
+    <title>Pos Restaurante | Empresa</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
@@ -15,12 +15,6 @@
     />
     <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="../dist/css/custom.css" />
-    <!-- DataTables -->
-    <link
-      rel="stylesheet"
-      href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css"
-    />
-    <!-- Favicon icono -->
     <link rel="icon" href="../dist/img/favicon.ico" type="image/png" />
   </head>
   <body
@@ -33,6 +27,7 @@
       >
         <img
           class="animation__wobble"
+          id="preloader-logo"
           src="../dist/img/AdminLTELogo.png"
           alt="AdminLTELogo"
           height="260"
@@ -99,9 +94,12 @@
             src="../dist/img/AdminLTELogo.png"
             alt="POS Logo"
             class="brand-image img-circle elevation-3"
+            id="brand-logo"
             style="opacity: 0.8"
           />
-          <span class="brand-text font-weight-light">POS Restaurante</span>
+          <span class="brand-text font-weight-light" id="brand-name"
+            >POS Restaurante</span
+          >
         </a>
         <div class="sidebar">
           <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -137,7 +135,7 @@
                 >
               </li>
               <li class="nav-item">
-                <a href="mesas.html" class="nav-link active"
+                <a href="mesas.html" class="nav-link"
                   ><i class="nav-icon fas fa-chair"></i>
                   <p>Mesas</p></a
                 >
@@ -180,28 +178,26 @@
                   <p>Recetas</p></a
                 >
               </li>
-              <li class="nav-header admin-only" style="display: none">
-                ADMINISTRACIÓN
-              </li>
-              <li class="nav-item admin-only" style="display: none">
+              <li class="nav-header">ADMINISTRACIÓN</li>
+              <li class="nav-item">
                 <a href="clientes.html" class="nav-link"
                   ><i class="nav-icon fas fa-user-friends"></i>
                   <p>Clientes</p></a
                 >
               </li>
-              <li class="nav-item admin-only" style="display: none">
+              <li class="nav-item">
                 <a href="usuarios.html" class="nav-link"
                   ><i class="nav-icon fas fa-users-cog"></i>
                   <p>Usuarios</p></a
                 >
               </li>
-              <li class="nav-item admin-only" style="display: none">
-                <a href="empresa.html" class="nav-link">
-                  <i class="nav-icon fas fa-building"></i>
-                  <p>Empresa</p>
-                </a>
+              <li class="nav-item active">
+                <a href="empresa.html" class="nav-link active"
+                  ><i class="nav-icon fas fa-building"></i>
+                  <p>Empresa</p></a
+                >
               </li>
-              <li class="nav-item admin-only" style="display: none">
+              <li class="nav-item">
                 <a href="configuracion.html" class="nav-link"
                   ><i class="nav-icon fas fa-cog"></i>
                   <p>Configuración</p></a
@@ -217,13 +213,15 @@
         <div class="content-header">
           <div class="container-fluid">
             <div class="row mb-2">
-              <div class="col-sm-6"><h1 class="m-0">Mesas</h1></div>
+              <div class="col-sm-6">
+                <h1 class="m-0"><i class="fas fa-building mr-2"></i>Empresa</h1>
+              </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                   <li class="breadcrumb-item">
                     <a href="index.html">Inicio</a>
                   </li>
-                  <li class="breadcrumb-item active">Mesas</li>
+                  <li class="breadcrumb-item active">Empresa</li>
                 </ol>
               </div>
             </div>
@@ -232,79 +230,140 @@
 
         <section class="content">
           <div class="container-fluid">
-            <!-- Alert -->
-            <div id="alert-box" class="d-none"></div>
+            <div id="alert-box" class="d-none mb-3"></div>
 
-            <!-- Resumen de estados -->
-            <div class="row mb-3">
-              <div class="col-6 col-md-3">
-                <div class="info-box">
-                  <span class="info-box-icon bg-success elevation-1"
-                    ><i class="fas fa-chair"></i
-                  ></span>
-                  <div class="info-box-content">
-                    <span class="info-box-text">Libres</span>
-                    <span class="info-box-number" id="stat-libres">—</span>
+            <div class="row">
+              <div class="col-md-7">
+                <div class="card card-success">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <i class="fas fa-building mr-2"></i>Datos de la Empresa
+                    </h3>
                   </div>
-                </div>
-              </div>
-              <div class="col-6 col-md-3">
-                <div class="info-box">
-                  <span class="info-box-icon bg-warning elevation-1"
-                    ><i class="fas fa-utensils"></i
-                  ></span>
-                  <div class="info-box-content">
-                    <span class="info-box-text">Ocupadas</span>
-                    <span class="info-box-number" id="stat-ocupadas">—</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  <form id="form-empresa" novalidate>
+                    <div class="card-body">
+                      <p class="text-muted mb-3">
+                        Esta información aparecerá en el encabezado de las
+                        <strong>facturas PDF</strong> generadas al registrar una
+                        venta.
+                      </p>
 
-            <!-- Card tabla -->
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-chair mr-2"></i>Listado de Mesas
-                </h3>
-                <div class="card-tools">
-                  <button
-                    id="btn-nueva-mesa"
-                    class="btn btn-primary btn-sm admin-only"
-                    style="display: none"
-                  >
-                    <i class="fas fa-plus mr-1"></i> Nueva Mesa
-                  </button>
-                </div>
-              </div>
-              <div class="card-body p-0">
-                <div class="table-responsive">
-                  <table
-                    id="table-mesas"
-                    class="table table-hover table-striped m-0"
-                    style="width: 100%"
-                  >
-                    <thead>
-                      <tr>
-                        <th style="width: 60px">#</th>
-                        <th>N° Mesa</th>
-                        <th style="width: 130px">Estado</th>
-                        <th
-                          class="admin-only text-center"
-                          style="width: 160px; display: none"
+                      <div class="form-group">
+                        <label for="emp-nombre"
+                          >Nombre / Razón Social
+                          <span class="text-danger">*</span></label
                         >
-                          Acciones
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody id="tbody-mesas">
-                      <tr>
-                        <td colspan="4" class="text-center text-muted py-4">
-                          <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                        <input
+                          type="text"
+                          id="emp-nombre"
+                          class="form-control"
+                          placeholder="Ej: SolucionesITEC"
+                          maxlength="150"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          El nombre es obligatorio.
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="emp-ruc">RUC</label>
+                        <input
+                          type="text"
+                          id="emp-ruc"
+                          class="form-control"
+                          placeholder="Ej: 9999999999001"
+                          maxlength="20"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label for="emp-direccion">Dirección</label>
+                        <input
+                          type="text"
+                          id="emp-direccion"
+                          class="form-control"
+                          placeholder="Ej: Av. 6 de Diciembre N23-45"
+                          maxlength="300"
+                        />
+                      </div>
+
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <div class="form-group">
+                            <label for="emp-telefono">Teléfono</label>
+                            <input
+                              type="text"
+                              id="emp-telefono"
+                              class="form-control"
+                              placeholder="Ej: 0999999999"
+                              maxlength="20"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-sm-6">
+                          <div class="form-group">
+                            <label for="emp-correo">Correo electrónico</label>
+                            <input
+                              type="email"
+                              id="emp-correo"
+                              class="form-control"
+                              placeholder="info@miempresa.com"
+                              maxlength="100"
+                            />
+                            <div class="invalid-feedback">
+                              Ingrese un correo válido.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-footer">
+                      <button
+                        type="submit"
+                        id="btn-guardar-empresa"
+                        class="btn btn-success"
+                      >
+                        <i class="fas fa-save mr-1"></i> Guardar cambios
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Vista previa factura -->
+              <div class="col-md-5">
+                <div class="card card-outline card-info">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <i class="fas fa-eye mr-2"></i>Vista previa en factura
+                    </h3>
+                  </div>
+                  <div class="card-body">
+                    <div
+                      class="border rounded p-3"
+                      style="font-size: 0.85rem; font-family: monospace"
+                    >
+                      <div class="text-right">
+                        <strong id="prev-nombre">—</strong><br />
+                        R.U.C.: <span id="prev-ruc">—</span><br />
+                        <em>FACTURA</em><br />
+                        No.001-001-000000001
+                      </div>
+                      <hr class="my-2" />
+                      <div class="text-right text-muted small">
+                        <span id="prev-direccion">—</span><br />
+                        Tel: <span id="prev-telefono">—</span><br />
+                        <span id="prev-correo">—</span>
+                      </div>
+                    </div>
+                    <p class="text-muted mt-2 small mb-0">
+                      <i class="fas fa-info-circle mr-1"></i> El logo de la
+                      empresa debe guardarse en
+                      <code>dist/img/logoempresa.png</code> para aparecer en las
+                      facturas PDF.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -321,125 +380,18 @@
           class="footer-brand-link"
           >SolucionesITEC</a
         >
-        &mdash; <strong>POS Restaurante</strong>
+        &mdash; <strong id="footer-brand-name">POS Restaurante</strong>
         <div class="float-right d-none d-sm-inline-block">
-          <b>Version</b> 1.0.0
+          <b>Version</b> <span id="footer-version">1.0.0</span>
         </div>
       </footer>
     </div>
 
-    <!-- Modal: Crear / Editar Mesa -->
-    <div class="modal fade" id="modal-mesa" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-header bg-primary">
-            <h5 class="modal-title" id="modal-mesa-title">Nueva Mesa</h5>
-            <button type="button" class="close text-white" data-dismiss="modal">
-              <span>&times;</span>
-            </button>
-          </div>
-          <form id="form-mesa" novalidate>
-            <div class="modal-body">
-              <input type="hidden" id="mesa-id" value="" />
-              <div class="form-group">
-                <label for="mesa-numero"
-                  >N° de Mesa <span class="text-danger">*</span></label
-                >
-                <input
-                  type="number"
-                  class="form-control"
-                  id="mesa-numero"
-                  placeholder="Ej: 6"
-                  min="1"
-                  required
-                />
-                <div class="invalid-feedback">
-                  El número de mesa es requerido y debe ser mayor a 0.
-                </div>
-              </div>
-              <div class="form-group" id="grupo-estado" style="display: none">
-                <label for="mesa-estado">Estado</label>
-                <select class="form-control" id="mesa-estado">
-                  <option value="libre">Libre</option>
-                  <option value="ocupada">Ocupada</option>
-                </select>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                class="btn btn-primary"
-                id="btn-guardar-mesa"
-              >
-                <i class="fas fa-save mr-1"></i> Guardar
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal: Confirmar Eliminar -->
-    <div
-      class="modal fade"
-      id="modal-confirmar-eliminar"
-      tabindex="-1"
-      role="dialog"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-header bg-danger">
-            <h5 class="modal-title text-white">Eliminar Mesa</h5>
-            <button type="button" class="close text-white" data-dismiss="modal">
-              <span>&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>
-              ¿Está seguro de eliminar la
-              <strong id="del-mesa-nombre"></strong>?
-            </p>
-            <p class="text-muted small">
-              Solo se puede eliminar si no tiene pedidos registrados.
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger"
-              id="btn-confirmar-eliminar"
-            >
-              <i class="fas fa-trash mr-1"></i> Eliminar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Scripts -->
     <script src="../plugins/jquery/jquery.min.js"></script>
     <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-    <script src="../dist/js/adminlte.js"></script>
-    <!-- DataTables -->
-    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <!-- POS Scripts -->
+    <script src="../dist/js/adminlte.min.js"></script>
     <script src="../utils/api.js"></script>
-    <script src="../utils/mesas.js"></script>
+    <script src="../utils/empresa.js"></script>
   </body>
 </html>

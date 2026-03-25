@@ -194,6 +194,12 @@
                 >
               </li>
               <li class="nav-item admin-only d-none">
+                <a href="empresa.html" class="nav-link"
+                  ><i class="nav-icon fas fa-building"></i>
+                  <p>Empresa</p></a
+                >
+              </li>
+              <li class="nav-item admin-only d-none">
                 <a href="configuracion.html" class="nav-link"
                   ><i class="nav-icon fas fa-cog"></i>
                   <p>Configuración</p></a
@@ -386,6 +392,7 @@
                           <th style="width: 130px">Método de pago</th>
                           <th style="width: 170px">Nº Factura</th>
                           <th style="width: 150px">Fecha</th>
+                          <th style="width: 70px" class="text-center">PDF</th>
                         </tr>
                       </thead>
                       <tbody id="tbody-ventas">
@@ -670,6 +677,13 @@
           <div class="modal-footer justify-content-center">
             <button
               type="button"
+              class="btn btn-primary px-4 mr-2"
+              id="btn-descargar-factura"
+            >
+              <i class="fas fa-file-pdf mr-1"></i> Descargar Factura
+            </button>
+            <button
+              type="button"
               class="btn btn-success px-4"
               data-dismiss="modal"
             >
@@ -688,6 +702,9 @@
     <!-- DataTables -->
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- pdfmake -->
+    <script src="../plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="../plugins/pdfmake/vfs_fonts.js"></script>
     <!-- App -->
     <script src="../utils/api.js"></script>
     <script src="../utils/ventas.js"></script>

@@ -10,8 +10,11 @@ const BASE_URL = "http://localhost/pos_restaurante/backend/public";
 // ── Año dinámico en el footer + toggle dark/light mode ───────────────────────
 document.addEventListener("DOMContentLoaded", function () {
   // Año en footer
+  var currentYear = new Date().getFullYear();
   var el = document.getElementById("footer-year");
-  if (el) el.textContent = new Date().getFullYear();
+  if (el) el.textContent = currentYear;
+  var elLogin = document.getElementById("login-footer-year");
+  if (elLogin) elLogin.textContent = currentYear;
 
   // Aplicar tema guardado
   var savedTheme = localStorage.getItem("pos_theme") || "dark";
@@ -301,5 +304,16 @@ var FacturaConfigAPI = {
   },
   update: function (data) {
     return request("PUT", "/api/factura-config", data);
+  },
+};
+
+var EmpresaAPI = {
+  get: function () {
+    return fetch(BASE_URL + "/api/empresa").then(function (r) {
+      return r.json();
+    });
+  },
+  update: function (data) {
+    return request("PUT", "/api/empresa", data);
   },
 };

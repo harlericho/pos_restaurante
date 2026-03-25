@@ -157,6 +157,20 @@ CREATE TABLE factura_config (
 INSERT INTO factura_config (id, establecimiento, punto_emision, secuencial) VALUES (1, '001', '001', 0);
 
 -- ============================================================
+-- MÓDULO EMPRESA
+-- ============================================================
+CREATE TABLE empresa (
+    id TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    ruc        VARCHAR(20)  NOT NULL DEFAULT '',
+    nombre     VARCHAR(150) NOT NULL DEFAULT 'Mi Empresa',
+    direccion  VARCHAR(300) NOT NULL DEFAULT '',
+    telefono   VARCHAR(20)  NOT NULL DEFAULT '',
+    correo     VARCHAR(100) NOT NULL DEFAULT '',
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+INSERT IGNORE INTO empresa (id) VALUES (1);
+
+-- ============================================================
 -- DATOS INICIALES
 -- ============================================================
 
