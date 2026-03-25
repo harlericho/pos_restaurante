@@ -1,5 +1,11 @@
 const BASE_URL = "http://localhost/pos_restaurante/backend/public";
 
+// ── Año dinámico en el footer ────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", function () {
+  var el = document.getElementById("footer-year");
+  if (el) el.textContent = new Date().getFullYear();
+});
+
 // ============ Auth Storage ============
 function getToken() {
   return localStorage.getItem("pos_token");
