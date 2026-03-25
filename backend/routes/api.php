@@ -26,6 +26,7 @@ require_once __DIR__ . '/../models/RecetaModel.php';
 require_once __DIR__ . '/../models/MesaModel.php';
 require_once __DIR__ . '/../models/PedidoModel.php';
 require_once __DIR__ . '/../models/VentaModel.php';
+require_once __DIR__ . '/../models/ClienteModel.php';
 
 // ── Controllers ───────────────────────────────────────────────────────────────
 require_once __DIR__ . '/../controllers/AuthController.php';
@@ -37,6 +38,7 @@ require_once __DIR__ . '/../controllers/RecetaController.php';
 require_once __DIR__ . '/../controllers/MesaController.php';
 require_once __DIR__ . '/../controllers/PedidoController.php';
 require_once __DIR__ . '/../controllers/VentaController.php';
+require_once __DIR__ . '/../controllers/ClienteController.php';
 
 // ── Router ────────────────────────────────────────────────────────────────────
 class Router
@@ -138,6 +140,13 @@ $router->add('GET',    '/api/ventas/reporte', [VentaController::class, 'reporte'
 $router->add('GET',    '/api/ventas',         [VentaController::class, 'index']);
 $router->add('GET',    '/api/ventas/{id}',    [VentaController::class, 'show']);
 $router->add('POST',   '/api/ventas',         [VentaController::class, 'store']);
+
+// ── Clientes ──────────────────────────────────────────────────────────────────
+$router->add('GET',    '/api/clientes',       [ClienteController::class, 'index']);
+$router->add('GET',    '/api/clientes/{id}',  [ClienteController::class, 'show']);
+$router->add('POST',   '/api/clientes',       [ClienteController::class, 'store']);
+$router->add('PUT',    '/api/clientes/{id}',  [ClienteController::class, 'update']);
+$router->add('DELETE', '/api/clientes/{id}',  [ClienteController::class, 'destroy']);
 
 // ── Dispatch ──────────────────────────────────────────────────────────────────
 // Determinar la URI relativa al directorio del script (public/)

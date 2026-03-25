@@ -166,7 +166,13 @@
                   <p>Recetas</p></a
                 >
               </li>
-              <li class="nav-header admin-only d-none">ADMINISTRACIÓN</li>
+              <li class="nav-header">ADMINISTRACIÓN</li>
+              <li class="nav-item">
+                <a href="clientes.html" class="nav-link"
+                  ><i class="nav-icon fas fa-user-friends"></i>
+                  <p>Clientes</p></a
+                >
+              </li>
               <li class="nav-item admin-only d-none">
                 <a href="usuarios.html" class="nav-link"
                   ><i class="nav-icon fas fa-users-cog"></i>
@@ -420,9 +426,7 @@
 
               <!-- Método de pago -->
               <div class="form-group mb-0">
-                <label for="cobrar-metodo">
-                  Método de pago <span class="text-danger">*</span>
-                </label>
+                <label>Método de pago <span class="text-danger">*</span></label>
                 <div class="d-flex flex-wrap" id="metodo-pago-options">
                   <div class="mr-3 mb-2">
                     <div class="icheck-primary">
@@ -433,9 +437,10 @@
                         value="efectivo"
                         checked
                       />
-                      <label for="metodo-efectivo">
-                        <i class="fas fa-money-bill-wave mr-1"></i> Efectivo
-                      </label>
+                      <label for="metodo-efectivo"
+                        ><i class="fas fa-money-bill-wave mr-1"></i>
+                        Efectivo</label
+                      >
                     </div>
                   </div>
                   <div class="mr-3 mb-2">
@@ -446,9 +451,9 @@
                         name="metodo_pago"
                         value="tarjeta"
                       />
-                      <label for="metodo-tarjeta">
-                        <i class="fas fa-credit-card mr-1"></i> Tarjeta
-                      </label>
+                      <label for="metodo-tarjeta"
+                        ><i class="fas fa-credit-card mr-1"></i> Tarjeta</label
+                      >
                     </div>
                   </div>
                   <div class="mb-2">
@@ -459,10 +464,117 @@
                         name="metodo_pago"
                         value="transferencia"
                       />
-                      <label for="metodo-transferencia">
-                        <i class="fas fa-exchange-alt mr-1"></i> Transferencia
-                      </label>
+                      <label for="metodo-transferencia"
+                        ><i class="fas fa-exchange-alt mr-1"></i>
+                        Transferencia</label
+                      >
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cliente (opcional) -->
+              <div class="form-group mt-3 mb-0">
+                <label for="cobrar-cliente-search">
+                  <i class="fas fa-user mr-1"></i> Cliente
+                  <small class="text-muted"
+                    >(opcional — dejar vacío = consumidor final)</small
+                  >
+                </label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    id="cobrar-cliente-search"
+                    class="form-control"
+                    placeholder="Buscar por nombre, CI o teléfono..."
+                    autocomplete="off"
+                  />
+                  <div class="input-group-append">
+                    <button
+                      type="button"
+                      class="btn btn-outline-success"
+                      id="btn-nuevo-cliente-cobrar"
+                      title="Registrar nuevo cliente"
+                    >
+                      <i class="fas fa-user-plus"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      id="btn-limpiar-cliente"
+                      title="Quitar cliente seleccionado"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <input type="hidden" id="cobrar-cliente-id" />
+                <div
+                  id="cliente-search-results"
+                  class="list-group mt-1"
+                  style="
+                    position: absolute;
+                    z-index: 9999;
+                    width: calc(100% - 30px);
+                    display: none;
+                  "
+                ></div>
+                <small
+                  id="cobrar-cliente-seleccionado"
+                  class="text-success d-none"
+                >
+                  <i class="fas fa-check-circle mr-1"></i
+                  ><span id="cobrar-cliente-nombre"></span>
+                </small>
+                <!-- Mini-form: nuevo cliente rápido -->
+                <div
+                  id="form-nuevo-cliente-cobrar"
+                  class="card card-body bg-dark border-secondary mt-2 p-2 d-none"
+                >
+                  <p class="text-white mb-2 small font-weight-bold">
+                    <i class="fas fa-user-plus mr-1"></i> Nuevo cliente
+                  </p>
+                  <div class="form-group mb-2">
+                    <input
+                      type="text"
+                      id="nc-nombre"
+                      class="form-control form-control-sm"
+                      placeholder="Nombre *"
+                    />
+                  </div>
+                  <div class="form-row mb-2">
+                    <div class="col">
+                      <input
+                        type="text"
+                        id="nc-ci"
+                        class="form-control form-control-sm"
+                        placeholder="CI / RUC *"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group mb-0">
+                    <input
+                      type="email"
+                      id="nc-email"
+                      class="form-control form-control-sm"
+                      placeholder="Email *"
+                    />
+                  </div>
+                  <div class="mt-2 d-flex justify-content-end">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-secondary mr-2"
+                      id="btn-cancelar-nc"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-success"
+                      id="btn-guardar-nc"
+                    >
+                      <i class="fas fa-save mr-1"></i>Guardar
+                    </button>
                   </div>
                 </div>
               </div>

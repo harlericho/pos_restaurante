@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pos Restaurante | Recetas</title>
+    <title>Pos Restaurante | Clientes</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
@@ -116,13 +116,13 @@
               role="menu"
               data-accordion="false"
             >
-              <li class="nav-item">
+              <li class="nav-item admin-only d-none">
                 <a href="index.html" class="nav-link"
                   ><i class="nav-icon fas fa-tachometer-alt"></i>
                   <p>Dashboard</p></a
                 >
               </li>
-              <li class="nav-item">
+              <li class="nav-item admin-only d-none">
                 <a href="mesas.html" class="nav-link"
                   ><i class="nav-icon fas fa-chair"></i>
                   <p>Mesas</p></a
@@ -140,42 +140,40 @@
                   <p>Ventas / Caja</p></a
                 >
               </li>
-              <li class="nav-header">CATÁLOGO</li>
-              <li class="nav-item">
+              <li class="nav-header admin-only d-none">CATÁLOGO</li>
+              <li class="nav-item admin-only d-none">
                 <a href="categorias.html" class="nav-link"
                   ><i class="nav-icon fas fa-tags"></i>
                   <p>Categorías</p></a
                 >
               </li>
-              <li class="nav-item">
+              <li class="nav-item admin-only d-none">
                 <a href="productos.html" class="nav-link"
                   ><i class="nav-icon fas fa-utensils"></i>
                   <p>Productos</p></a
                 >
               </li>
-              <li class="nav-header">INVENTARIO</li>
-              <li class="nav-item">
+              <li class="nav-header admin-only d-none">INVENTARIO</li>
+              <li class="nav-item admin-only d-none">
                 <a href="insumos.html" class="nav-link"
                   ><i class="nav-icon fas fa-boxes"></i>
                   <p>Insumos</p></a
                 >
               </li>
-              <li class="nav-item">
-                <a href="recetas.html" class="nav-link active"
+              <li class="nav-item admin-only d-none">
+                <a href="recetas.html" class="nav-link"
                   ><i class="nav-icon fas fa-book-open"></i>
                   <p>Recetas</p></a
                 >
               </li>
-              <li class="nav-header admin-only" style="display: none">
-                ADMINISTRACIÓN
-              </li>
-              <li class="nav-item admin-only" style="display: none">
-                <a href="clientes.html" class="nav-link"
+              <li class="nav-header">ADMINISTRACIÓN</li>
+              <li class="nav-item active">
+                <a href="clientes.html" class="nav-link active"
                   ><i class="nav-icon fas fa-user-friends"></i>
                   <p>Clientes</p></a
                 >
               </li>
-              <li class="nav-item admin-only" style="display: none">
+              <li class="nav-item admin-only d-none">
                 <a href="usuarios.html" class="nav-link"
                   ><i class="nav-icon fas fa-users-cog"></i>
                   <p>Usuarios</p></a
@@ -191,13 +189,13 @@
         <div class="content-header">
           <div class="container-fluid">
             <div class="row mb-2">
-              <div class="col-sm-6"><h1 class="m-0">Recetas</h1></div>
+              <div class="col-sm-6"><h1 class="m-0">Clientes</h1></div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                   <li class="breadcrumb-item">
                     <a href="index.html">Inicio</a>
                   </li>
-                  <li class="breadcrumb-item active">Recetas</li>
+                  <li class="breadcrumb-item active">Clientes</li>
                 </ol>
               </div>
             </div>
@@ -209,41 +207,53 @@
             <!-- Alert -->
             <div id="alert-box" class="d-none"></div>
 
-            <!-- Card tabla de productos -->
+            <!-- Stats -->
+            <div class="row mb-3">
+              <div class="col-6 col-md-3">
+                <div class="info-box">
+                  <span class="info-box-icon bg-primary elevation-1"
+                    ><i class="fas fa-user-friends"></i
+                  ></span>
+                  <div class="info-box-content">
+                    <span class="info-box-text">Total Clientes</span>
+                    <span class="info-box-number" id="stat-total">&mdash;</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card tabla -->
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">
-                  <i class="fas fa-book-open mr-2"></i>Productos y sus Recetas
+                  <i class="fas fa-user-friends mr-2"></i>Listado de Clientes
                 </h3>
                 <div class="card-tools">
-                  <span class="text-muted small">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    Haz clic en "Ver Receta" para gestionar los ingredientes
-                  </span>
+                  <button id="btn-nuevo-cliente" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus mr-1"></i> Nuevo Cliente
+                  </button>
                 </div>
               </div>
               <div class="card-body p-0">
                 <div class="table-responsive">
                   <table
-                    id="table-recetas"
+                    id="table-clientes"
                     class="table table-hover table-striped m-0"
                     style="width: 100%"
                   >
                     <thead>
                       <tr>
                         <th style="width: 50px">#</th>
-                        <th>Producto</th>
-                        <th style="width: 150px">Categoría</th>
-                        <th style="width: 80px">Precio</th>
-                        <th class="text-center" style="width: 130px">
-                          Ingredientes
-                        </th>
-                        <th class="text-center" style="width: 120px">
+                        <th>Nombre</th>
+                        <th style="width: 120px">CI / RUC</th>
+                        <th style="width: 130px">Teléfono</th>
+                        <th>Email</th>
+                        <th class="text-center" style="width: 100px">
                           Acciones
                         </th>
                       </tr>
                     </thead>
-                    <tbody id="tbody-recetas">
+                    <tbody id="tbody-clientes">
                       <tr>
                         <td colspan="6" class="text-center text-muted py-4">
                           <i class="fas fa-spinner fa-spin mr-2"></i>Cargando...
@@ -266,162 +276,148 @@
       </footer>
     </div>
 
-    <!-- Modal: Ver / Gestionar Receta de un Producto -->
-    <div
-      class="modal fade"
-      id="modal-receta"
-      tabindex="-1"
-      role="dialog"
-      data-backdrop="static"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <!-- Modal: Crear / Editar Cliente -->
+    <div class="modal fade" id="modal-cliente" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-          <div class="modal-header bg-success">
-            <h5 class="modal-title">
-              <i class="fas fa-book-open mr-2"></i>
-              Receta: <span id="receta-producto-nombre"></span>
-            </h5>
+          <div class="modal-header bg-primary">
+            <h5 class="modal-title" id="modal-cliente-title">Nuevo Cliente</h5>
+            <button type="button" class="close text-white" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <form id="form-cliente" novalidate>
+            <div class="modal-body">
+              <input type="hidden" id="cliente-id" />
+
+              <div class="form-group">
+                <label for="cliente-nombre"
+                  >Nombre <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  id="cliente-nombre"
+                  class="form-control"
+                  placeholder="Ej: María García"
+                  maxlength="150"
+                  required
+                />
+                <div class="invalid-feedback">El nombre es requerido.</div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="cliente-ci"
+                      >CI / RUC <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      id="cliente-ci"
+                      class="form-control"
+                      placeholder="Ej: 1234567"
+                      maxlength="30"
+                      required
+                    />
+                    <div class="invalid-feedback">
+                      El CI / RUC es requerido.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="cliente-telefono">Teléfono</label>
+                    <input
+                      type="text"
+                      id="cliente-telefono"
+                      class="form-control"
+                      placeholder="Ej: 591 70000000"
+                      maxlength="20"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="cliente-email"
+                  >Email <span class="text-danger">*</span></label
+                >
+                <input
+                  type="email"
+                  id="cliente-email"
+                  class="form-control"
+                  placeholder="Ej: cliente@email.com"
+                  maxlength="100"
+                  required
+                />
+                <div class="invalid-feedback">
+                  El email es requerido y debe ser válido.
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                id="btn-guardar-cliente"
+              >
+                <i class="fas fa-save mr-1"></i> Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Confirmar Eliminar -->
+    <div class="modal fade" id="modal-eliminar" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-danger">
+            <h5 class="modal-title">Eliminar Cliente</h5>
             <button type="button" class="close text-white" data-dismiss="modal">
               <span>&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <!-- Formulario agregar ingrediente (solo admin) -->
-            <div
-              id="form-agregar-wrapper"
-              class="admin-only"
-              style="display: none"
-            >
-              <h6 class="text-muted mb-2">
-                <i class="fas fa-plus-circle mr-1"></i>Agregar ingrediente
-              </h6>
-              <form id="form-agregar-ingrediente" class="form-inline mb-3">
-                <div class="form-group mr-2 flex-grow-1">
-                  <label class="sr-only">Insumo</label>
-                  <select id="sel-insumo" class="form-control w-100" required>
-                    <option value="">-- Selecciona un insumo --</option>
-                  </select>
-                </div>
-                <div class="form-group mr-2" style="width: 130px">
-                  <label class="sr-only">Cantidad</label>
-                  <input
-                    type="number"
-                    id="input-cantidad"
-                    class="form-control"
-                    placeholder="Cantidad"
-                    min="0.001"
-                    step="0.001"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  id="btn-agregar-ingrediente"
-                  class="btn btn-success"
-                >
-                  <i class="fas fa-plus mr-1"></i> Agregar
-                </button>
-              </form>
-              <hr />
-            </div>
-
-            <!-- Lista de ingredientes -->
-            <h6 class="text-muted mb-2">
-              <i class="fas fa-list mr-1"></i>Ingredientes registrados
-            </h6>
-            <div id="receta-loading" class="text-center py-3 text-muted">
-              <i class="fas fa-spinner fa-spin mr-2"></i>Cargando
-              ingredientes...
-            </div>
-            <table
-              id="table-ingredientes"
-              class="table table-sm table-bordered table-striped d-none"
-            >
-              <thead class="thead-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Insumo</th>
-                  <th style="width: 120px">Cantidad</th>
-                  <th style="width: 90px">Unidad</th>
-                  <th
-                    class="admin-only text-center"
-                    style="width: 80px; display: none"
-                  >
-                    Quitar
-                  </th>
-                </tr>
-              </thead>
-              <tbody id="tbody-ingredientes"></tbody>
-            </table>
-            <div id="receta-vacia" class="text-center text-muted py-3 d-none">
-              <i class="fas fa-inbox mr-2"></i>Este producto no tiene
-              ingredientes registrados.
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              <i class="fas fa-times mr-1"></i> Cerrar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal: Confirmar quitar ingrediente -->
-    <div
-      class="modal fade"
-      id="modal-confirmar-quitar"
-      tabindex="-1"
-      role="dialog"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-header bg-danger">
-            <h5 class="modal-title">Confirmar eliminación</h5>
-            <button type="button" class="close text-white" data-dismiss="modal">
-              <span>&times;</span>
-            </button>
-          </div>
-          <div class="modal-body text-center">
-            <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
             <p>
-              ¿Quitar el ingrediente
-              <strong id="del-ingrediente-nombre"></strong>
-              de la receta?
+              ¿Desea eliminar al cliente <strong id="eliminar-nombre"></strong>?
             </p>
+            <p class="text-muted small">Esta acción no se puede deshacer.</p>
           </div>
-          <div class="modal-footer justify-content-center">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
               Cancelar
             </button>
             <button
               type="button"
-              id="btn-confirmar-quitar"
               class="btn btn-danger"
+              id="btn-confirmar-eliminar"
             >
-              <i class="fas fa-trash mr-1"></i> Quitar
+              <i class="fas fa-trash mr-1"></i> Eliminar
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- SCRIPTS -->
     <script src="../plugins/jquery/jquery.min.js"></script>
     <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-    <script src="../dist/js/adminlte.min.js"></script>
+    <script src="../dist/js/adminlte.js"></script>
+    <!-- DataTables -->
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- POS Scripts -->
     <script src="../utils/api.js"></script>
-    <script src="../utils/recetas.js"></script>
+    <script src="../utils/clientes.js"></script>
   </body>
 </html>

@@ -43,8 +43,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ── Reporte (admin) ───────────────────────────────────────────────────
   if (_isAdmin) {
-    // Establecer fechas por defecto: hoy
-    var hoy = new Date().toISOString().substring(0, 10);
+    // Establecer fechas por defecto: hoy (usando fecha local, no UTC)
+    var _ahora = new Date();
+    var hoy =
+      _ahora.getFullYear() +
+      "-" +
+      String(_ahora.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(_ahora.getDate()).padStart(2, "0");
     el("filtro-desde").value = hoy;
     el("filtro-hasta").value = hoy;
 
@@ -145,6 +151,9 @@ function abrirModalCobrar(pedidoId, mesaNumero, mesero, total) {
   // Resetear a efectivo
   document.getElementById("metodo-efectivo").checked = true;
 
+  // Resetear cliente
+  _limpiarClienteCobrar();
+
   $("#modal-cobrar").modal("show");
 }
 
@@ -167,6 +176,7 @@ async function registrarCobro() {
     var resp = await VentasAPI.create({
       pedido_id: pedidoId,
       metodo_pago: metodoPago.value,
+      cliente_id: _getClienteIdCobrar() || undefined,
     });
 
     $("#modal-cobrar").modal("hide");
@@ -356,4 +366,204 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Búsqueda de cliente en modal cobrar
+// ═══════════════════════════════════════════════════════════════════════
+var _clienteSearchTimer = null;
+
+document.addEventListener("DOMContentLoaded", function () {
+  var inputSearch = document.getElementById("cobrar-cliente-search");
+  var btnLimpiar = document.getElementById("btn-limpiar-cliente");
+  var resultsBox = document.getElementById("cliente-search-results");
+
+  if (!inputSearch) return;
+
+  inputSearch.addEventListener("input", function () {
+    clearTimeout(_clienteSearchTimer);
+    var q = this.value.trim();
+
+    if (q.length < 2) {
+      if (resultsBox) resultsBox.style.display = "none";
+      return;
+    }
+
+    _clienteSearchTimer = setTimeout(async function () {
+      try {
+        var resp = await ClientesAPI.search(q);
+        var clientes = resp.data || [];
+        resultsBox.innerHTML = "";
+
+        if (clientes.length === 0) {
+          resultsBox.innerHTML =
+            '<div class="list-group-item text-muted small">Sin resultados</div>';
+        } else {
+          clientes.forEach(function (c) {
+            var item = document.createElement("a");
+            item.href = "#";
+            item.className = "list-group-item list-group-item-action py-2";
+            item.innerHTML =
+              "<strong>" +
+              escapeHtml(c.nombre) +
+              "</strong>" +
+              (c.ci_nit
+                ? ' <small class="text-muted">CI: ' +
+                  escapeHtml(c.ci_nit) +
+                  "</small>"
+                : "") +
+              (c.telefono
+                ? ' <small class="text-muted">— Tel: ' +
+                  escapeHtml(c.telefono) +
+                  "</small>"
+                : "");
+            item.addEventListener("click", function (e) {
+              e.preventDefault();
+              _seleccionarCliente(c.id, c.nombre);
+            });
+            resultsBox.appendChild(item);
+          });
+        }
+        resultsBox.style.display = "block";
+      } catch (err) {
+        console.error("[clienteSearch]", err);
+      }
+    }, 300);
+  });
+
+  if (btnLimpiar) {
+    btnLimpiar.addEventListener("click", function () {
+      _limpiarClienteCobrar();
+    });
+  }
+
+  // ── Nuevo cliente rápido ─────────────────────────────────────────────
+  var btnNuevoNC = document.getElementById("btn-nuevo-cliente-cobrar");
+  var formNC = document.getElementById("form-nuevo-cliente-cobrar");
+  var btnCancelarNC = document.getElementById("btn-cancelar-nc");
+  var btnGuardarNC = document.getElementById("btn-guardar-nc");
+
+  if (btnNuevoNC && formNC) {
+    btnNuevoNC.addEventListener("click", function () {
+      formNC.classList.toggle("d-none");
+      if (!formNC.classList.contains("d-none")) {
+        document.getElementById("nc-nombre").focus();
+      }
+    });
+  }
+
+  if (btnCancelarNC && formNC) {
+    btnCancelarNC.addEventListener("click", function () {
+      _cerrarFormNuevoCliente();
+    });
+  }
+
+  if (btnGuardarNC) {
+    btnGuardarNC.addEventListener("click", function () {
+      _guardarNuevoClienteCobrar();
+    });
+  }
+
+  // Cerrar resultados al hacer clic fuera
+  document.addEventListener("click", function (e) {
+    if (
+      resultsBox &&
+      !resultsBox.contains(e.target) &&
+      e.target !== inputSearch
+    ) {
+      resultsBox.style.display = "none";
+    }
+  });
+});
+
+function _seleccionarCliente(id, nombre) {
+  document.getElementById("cobrar-cliente-id").value = id;
+  document.getElementById("cobrar-cliente-search").value = nombre;
+  document.getElementById("cobrar-cliente-nombre").textContent = nombre;
+  document
+    .getElementById("cobrar-cliente-seleccionado")
+    .classList.remove("d-none");
+  var r = document.getElementById("cliente-search-results");
+  if (r) r.style.display = "none";
+}
+
+function _limpiarClienteCobrar() {
+  document.getElementById("cobrar-cliente-id").value = "";
+  document.getElementById("cobrar-cliente-search").value = "";
+  document
+    .getElementById("cobrar-cliente-seleccionado")
+    .classList.add("d-none");
+  var r = document.getElementById("cliente-search-results");
+  if (r) r.style.display = "none";
+}
+
+function _cerrarFormNuevoCliente() {
+  var formNC = document.getElementById("form-nuevo-cliente-cobrar");
+  if (formNC) formNC.classList.add("d-none");
+  ["nc-nombre", "nc-ci", "nc-email"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.value = "";
+      el.classList.remove("is-invalid");
+    }
+  });
+}
+
+async function _guardarNuevoClienteCobrar() {
+  var nombre = document.getElementById("nc-nombre").value.trim();
+  var ciNit = document.getElementById("nc-ci").value.trim();
+  var email = document.getElementById("nc-email").value.trim();
+
+  var valid = true;
+  if (!nombre) {
+    document.getElementById("nc-nombre").classList.add("is-invalid");
+    document.getElementById("nc-nombre").focus();
+    valid = false;
+  } else {
+    document.getElementById("nc-nombre").classList.remove("is-invalid");
+  }
+  if (!ciNit) {
+    document.getElementById("nc-ci").classList.add("is-invalid");
+    if (valid) document.getElementById("nc-ci").focus();
+    valid = false;
+  } else {
+    document.getElementById("nc-ci").classList.remove("is-invalid");
+  }
+  if (!email) {
+    document.getElementById("nc-email").classList.add("is-invalid");
+    if (valid) document.getElementById("nc-email").focus();
+    valid = false;
+  } else {
+    document.getElementById("nc-email").classList.remove("is-invalid");
+  }
+  if (!valid) return;
+
+  var btnGuardar = document.getElementById("btn-guardar-nc");
+  btnGuardar.disabled = true;
+  btnGuardar.innerHTML =
+    '<i class="fas fa-spinner fa-spin mr-1"></i>Guardando...';
+
+  try {
+    var resp = await ClientesAPI.create({
+      nombre: nombre,
+      ci_nit: ciNit,
+      telefono: null,
+      email: email,
+    });
+    var nuevoCliente = resp.data;
+    _seleccionarCliente(nuevoCliente.id, nuevoCliente.nombre);
+    _cerrarFormNuevoCliente();
+  } catch (err) {
+    var msg =
+      (err.data && err.data.error) || err.message || "Error al crear cliente.";
+    alert(msg);
+  } finally {
+    btnGuardar.disabled = false;
+    btnGuardar.innerHTML = '<i class="fas fa-save mr-1"></i>Guardar';
+  }
+}
+
+function _getClienteIdCobrar() {
+  var val = document.getElementById("cobrar-cliente-id").value;
+  return val ? parseInt(val, 10) : null;
 }

@@ -15,11 +15,13 @@ class VentaModel
   public function findAll(): array
   {
     return $this->db->query("
-            SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre
+            SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
+                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id
             JOIN mesas m ON m.id = p.mesa_id
             JOIN usuarios u ON u.id = p.usuario_id
+            LEFT JOIN clientes c ON c.id = v.cliente_id
             ORDER BY v.fecha DESC
         ")->fetchAll();
   }
@@ -27,11 +29,13 @@ class VentaModel
   public function findById(int $id)
   {
     $stmt = $this->db->prepare("
-            SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre
+            SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
+                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id
             JOIN mesas m ON m.id = p.mesa_id
             JOIN usuarios u ON u.id = p.usuario_id
+            LEFT JOIN clientes c ON c.id = v.cliente_id
             WHERE v.id = ?
         ");
     $stmt->execute([$id]);
@@ -46,10 +50,11 @@ class VentaModel
   {
     $this->db->beginTransaction();
     try {
+      $clienteId = $data['cliente_id'] ?? null;
       $stmt = $this->db->prepare(
-        "INSERT INTO ventas (pedido_id, total, metodo_pago) VALUES (?, ?, ?)"
+        "INSERT INTO ventas (pedido_id, cliente_id, total, metodo_pago) VALUES (?, ?, ?, ?)"
       );
-      $stmt->execute([$data['pedido_id'], $data['total'], $data['metodo_pago']]);
+      $stmt->execute([$data['pedido_id'], $clienteId, $data['total'], $data['metodo_pago']]);
       $ventaId = (int) $this->db->lastInsertId();
 
       // Cerrar el pedido
@@ -67,11 +72,13 @@ class VentaModel
   public function getReporte(string $desde, string $hasta): array
   {
     $stmt = $this->db->prepare("
-            SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre
+            SELECT v.*, p.mesa_id, m.numero AS mesa_numero, u.nombre AS usuario_nombre,
+                   c.nombre AS cliente_nombre, c.ci_nit AS cliente_ci_nit
             FROM ventas v
             JOIN pedidos p ON p.id = v.pedido_id
             JOIN mesas m ON m.id = p.mesa_id
             JOIN usuarios u ON u.id = p.usuario_id
+            LEFT JOIN clientes c ON c.id = v.cliente_id
             WHERE DATE(v.fecha) BETWEEN ? AND ?
             ORDER BY v.fecha DESC
         ");

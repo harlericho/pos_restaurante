@@ -35,8 +35,9 @@ class VentaController
   public function store(object $tokenData): void
   {
     $body      = json_decode(file_get_contents('php://input'), true) ?? [];
-    $pedidoId  = $body['pedido_id'] ?? null;
+    $pedidoId   = $body['pedido_id']   ?? null;
     $metodoPago = trim($body['metodo_pago'] ?? '');
+    $clienteId  = isset($body['cliente_id']) ? (int) $body['cliente_id'] : null;
 
     if (!$pedidoId || $metodoPago === '') {
       Response::json(422, ['error' => 'Los campos pedido_id y metodo_pago son requeridos']);
@@ -64,6 +65,7 @@ class VentaController
 
     $ventaId = $this->model->create([
       'pedido_id'   => (int) $pedidoId,
+      'cliente_id'  => $clienteId,
       'total'       => (float) $pedido['total'],
       'metodo_pago' => $metodoPago,
     ]);

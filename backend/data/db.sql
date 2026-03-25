@@ -128,6 +128,22 @@ END$$
 DELIMITER ;
 
 -- ============================================================
+-- MÓDULO CLIENTES
+-- ============================================================
+CREATE TABLE clientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    ci_nit VARCHAR(30),
+    telefono VARCHAR(20),
+    email VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Relacionar ventas con cliente (opcional: consumidor final = NULL)
+ALTER TABLE ventas ADD COLUMN cliente_id INT NULL AFTER pedido_id;
+ALTER TABLE ventas ADD CONSTRAINT fk_ventas_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL;
+
+-- ============================================================
 -- DATOS INICIALES
 -- ============================================================
 

@@ -221,3 +221,24 @@ var VentasAPI = {
     );
   },
 };
+
+var ClientesAPI = {
+  getAll: function () {
+    return request("GET", "/api/clientes");
+  },
+  search: function (q) {
+    return request("GET", "/api/clientes?q=" + encodeURIComponent(q));
+  },
+  getById: function (id) {
+    return request("GET", "/api/clientes/" + id);
+  },
+  create: function (data) {
+    return request("POST", "/api/clientes", data);
+  },
+  update: function (id, data) {
+    return request("PUT", "/api/clientes/" + id, data);
+  },
+  remove: function (id) {
+    return request("DELETE", "/api/clientes/" + id);
+  },
+};

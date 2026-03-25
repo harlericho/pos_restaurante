@@ -19,6 +19,8 @@ class Database
       ];
 
       self::$connection = new PDO($dsn, DB_USER, DB_PASS, $options);
+      // Sincronizar zona horaria de MySQL con la de PHP
+      self::$connection->exec("SET time_zone = '" . date('P') . "'");
     }
 
     return self::$connection;
