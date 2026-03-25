@@ -96,6 +96,12 @@ class PedidoController
       Response::json(409, ['error' => 'El producto no está disponible']);
     }
 
+    // Verificar stock suficiente (terminado = stock propio, elaborado = insumos)
+    $stockError = $productoModel->verificarStock((int) $productoId, (int) $cantidad);
+    if ($stockError !== null) {
+      Response::json(409, ['error' => $stockError]);
+    }
+
     $this->model->addDetalle((int) $id, [
       'producto_id' => (int) $productoId,
       'cantidad'    => (int) $cantidad,

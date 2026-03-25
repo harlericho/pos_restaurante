@@ -89,4 +89,45 @@ class ProductoModel
     $stmt = $this->db->prepare("UPDATE productos SET estado = 0 WHERE id = ?");
     return $stmt->execute([$id]);
   }
+
+  /**
+   * Verifica si hay stock suficiente para preparar $cantidad unidades del producto.
+   * Retorna null si hay stock, o un mensaje de error si no alcanza.
+   */
+  public function verificarStock(int $productoId, int $cantidad): ?string
+  {
+    $producto = $this->findById($productoId);
+    if (!$producto) return null;
+
+    $tipo = $producto['tipo'] ?? 'elaborado';
+
+    if ($tipo === 'terminado') {
+      $disponible = (float) ($producto['stock'] ?? 0);
+      if ($disponible < $cantidad) {
+        return "Stock insuficiente para '{$producto['nombre']}'. "
+          . "Disponible: {$disponible} unidad(es), solicitado: {$cantidad}.";
+      }
+    } else {
+      // elaborado: verificar insumos según receta
+      $stmt = $this->db->prepare("
+        SELECT i.nombre, i.stock, r.cantidad AS cant_receta
+        FROM recetas r
+        JOIN insumos i ON i.id = r.insumo_id
+        WHERE r.producto_id = ?
+      ");
+      $stmt->execute([$productoId]);
+      $ingredientes = $stmt->fetchAll();
+
+      foreach ($ingredientes as $ing) {
+        $necesario  = (float) $ing['cant_receta'] * $cantidad;
+        $disponible = (float) $ing['stock'];
+        if ($disponible < $necesario) {
+          return "Insumo insuficiente: '{$ing['nombre']}' para "
+            . "'{$producto['nombre']}'. Necesario: {$necesario}, Disponible: {$disponible}.";
+        }
+      }
+    }
+
+    return null;
+  }
 }

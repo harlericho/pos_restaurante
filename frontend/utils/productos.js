@@ -156,12 +156,32 @@ async function loadProductos(categoriaId) {
             "</td>"
           : "";
 
-        var tipoCell =
-          p.tipo === "terminado"
-            ? '<span class="badge badge-success">Terminado</span><br><small>Stock: ' +
-              parseFloat(p.stock || 0).toFixed(0) +
-              "</small>"
-            : '<span class="badge badge-info">Elaborado</span>';
+        var tipoCell;
+        if (p.tipo === "terminado") {
+          var stock = parseFloat(p.stock || 0);
+          var stockBadge, stockColor;
+          if (stock <= 0) {
+            stockBadge = "badge-danger";
+            stockColor = "text-danger font-weight-bold";
+          } else if (stock < 10) {
+            stockBadge = "badge-warning";
+            stockColor = "text-warning font-weight-bold";
+          } else {
+            stockBadge = "badge-success";
+            stockColor = "text-success";
+          }
+          tipoCell =
+            '<span class="badge ' +
+            stockBadge +
+            '">Terminado</span><br>' +
+            '<small class="' +
+            stockColor +
+            '">Stock: ' +
+            stock.toFixed(0) +
+            "</small>";
+        } else {
+          tipoCell = '<span class="badge badge-info">Elaborado</span>';
+        }
 
         return (
           "<tr>" +
