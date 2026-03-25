@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -19,6 +19,7 @@
     />
     <!-- Theme style -->
     <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="../dist/css/custom.css" />
     <!-- Favicon icono -->
     <link rel="icon" href="../dist/img/favicon.ico" type="image/png" />
   </head>
@@ -56,6 +57,17 @@
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
+            <a
+              class="nav-link"
+              id="btn-toggle-darkmode"
+              href="#"
+              role="button"
+              title="Cambiar modo"
+            >
+              <i class="fas fa-moon" id="icon-darkmode"></i>
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" data-widget="fullscreen" href="#" role="button">
               <i class="fas fa-expand-arrows-alt"></i>
             </a>
@@ -76,7 +88,7 @@
               </li>
               <li class="user-footer">
                 <a href="#" id="btn-logout" class="btn btn-default btn-flat">
-                  <i class="fas fa-sign-out-alt mr-1"></i> Cerrar sesión
+                  <i class="fas fa-sign-out-alt mr-1"></i> Cerrar sesi�n
                 </a>
               </li>
             </ul>
@@ -264,7 +276,7 @@
                   <div class="info-box-content">
                     <span class="info-box-text">Mesas Libres</span>
                     <span class="info-box-number" id="stat-mesas-libres"
-                      >â€”</span
+                      >—</span
                     >
                   </div>
                 </div>
@@ -277,7 +289,7 @@
                   <div class="info-box-content">
                     <span class="info-box-text">Mesas Ocupadas</span>
                     <span class="info-box-number" id="stat-mesas-ocupadas"
-                      >â€”</span
+                      >—</span
                     >
                   </div>
                 </div>
@@ -290,7 +302,7 @@
                   <div class="info-box-content">
                     <span class="info-box-text">Pedidos Abiertos</span>
                     <span class="info-box-number" id="stat-pedidos-abiertos"
-                      >â€”</span
+                      >—</span
                     >
                   </div>
                 </div>
@@ -302,9 +314,7 @@
                   ></span>
                   <div class="info-box-content">
                     <span class="info-box-text">Ventas Hoy</span>
-                    <span class="info-box-number" id="stat-ventas-hoy"
-                      >â€”</span
-                    >
+                    <span class="info-box-number" id="stat-ventas-hoy">—</span>
                   </div>
                 </div>
               </div>
@@ -321,7 +331,7 @@
                   <div class="info-box-content">
                     <span class="info-box-text">Ingresos Hoy</span>
                     <span class="info-box-number" id="stat-ingresos-hoy"
-                      >â€”</span
+                      >—</span
                     >
                   </div>
                 </div>
@@ -388,7 +398,7 @@
           href="https://solucionesitec.com/"
           target="_blank"
           rel="noopener"
-          class="text-light"
+          class="footer-brand-link"
           >SolucionesITEC</a
         >
         &mdash; <strong>POS Restaurante</strong>

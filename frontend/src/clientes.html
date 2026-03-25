@@ -14,6 +14,7 @@
       href="../plugins/overlayScrollbars/css/OverlayScrollbars.min.css"
     />
     <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="../dist/css/custom.css" />
     <!-- DataTables -->
     <link
       rel="stylesheet"
@@ -52,6 +53,17 @@
           </li>
         </ul>
         <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              id="btn-toggle-darkmode"
+              href="#"
+              role="button"
+              title="Cambiar modo"
+            >
+              <i class="fas fa-moon" id="icon-darkmode"></i>
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" data-widget="fullscreen" href="#" role="button">
               <i class="fas fa-expand-arrows-alt"></i>
@@ -282,7 +294,7 @@
           href="https://solucionesitec.com/"
           target="_blank"
           rel="noopener"
-          class="text-light"
+          class="footer-brand-link"
           >SolucionesITEC</a
         >
         &mdash; <strong>POS Restaurante</strong>

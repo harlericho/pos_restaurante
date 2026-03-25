@@ -1,0 +1,64 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   custom.css — Estilos personalizados POS Restaurante
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Link SolucionesITEC en el footer — se adapta al modo ────────────────── */
+.dark-mode .footer-brand-link {
+  color: #adb5bd;
+}
+.dark-mode .footer-brand-link:hover {
+  color: #fff;
+}
+body:not(.dark-mode) .footer-brand-link {
+  color: #007bff;
+}
+body:not(.dark-mode) .footer-brand-link:hover {
+  color: #0056b3;
+}
+
+/* ── Fix autofill del navegador en modo OSCURO ───────────────────────────── */
+/* El browser sobreescribe el fondo del input con su propio color claro;
+   este hack fuerza el fondo oscuro mediante box-shadow inset. */
+.dark-mode input:-webkit-autofill,
+.dark-mode input:-webkit-autofill:hover,
+.dark-mode input:-webkit-autofill:focus,
+.dark-mode input:-webkit-autofill:active,
+.dark-mode textarea:-webkit-autofill,
+.dark-mode textarea:-webkit-autofill:hover,
+.dark-mode textarea:-webkit-autofill:focus,
+.dark-mode select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #343a40 inset !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff;
+}
+
+/* ── Fix color de texto en inputs en modo OSCURO ─────────────────────────── */
+.dark-mode .form-control,
+.dark-mode .form-control:focus {
+  color: #fff !important;
+  background-color: #343a40 !important;
+  border-color: #6c757d !important;
+}
+
+.dark-mode .form-control::placeholder {
+  color: #adb5bd !important;
+}
+
+/* ── Fix autofill del navegador en modo CLARO ────────────────────────────── */
+body:not(.dark-mode) input:-webkit-autofill,
+body:not(.dark-mode) input:-webkit-autofill:hover,
+body:not(.dark-mode) input:-webkit-autofill:focus,
+body:not(.dark-mode) input:-webkit-autofill:active,
+body:not(.dark-mode) textarea:-webkit-autofill,
+body:not(.dark-mode) select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #495057 !important;
+  caret-color: #495057;
+}
+
+/* ── Fix color de texto en inputs en modo CLARO ──────────────────────────── */
+body:not(.dark-mode) .form-control,
+body:not(.dark-mode) .form-control:focus {
+  color: #495057 !important;
+  background-color: #fff !important;
+}

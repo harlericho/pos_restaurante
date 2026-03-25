@@ -1,9 +1,55 @@
 const BASE_URL = "http://localhost/pos_restaurante/backend/public";
 
-// ── Año dinámico en el footer ────────────────────────────────────────────────
+// ── Tema oscuro / claro — aplicar antes de DOMContentLoaded para evitar flash ─
+(function () {
+  if (localStorage.getItem("pos_theme") === "light") {
+    document.documentElement.classList.add("_theme_light_pending");
+  }
+})();
+
+// ── Año dinámico en el footer + toggle dark/light mode ───────────────────────
 document.addEventListener("DOMContentLoaded", function () {
+  // Año en footer
   var el = document.getElementById("footer-year");
   if (el) el.textContent = new Date().getFullYear();
+
+  // Aplicar tema guardado
+  var savedTheme = localStorage.getItem("pos_theme") || "dark";
+  var icon = document.getElementById("icon-darkmode");
+  if (savedTheme === "light") {
+    document.body.classList.remove("dark-mode");
+    if (icon) {
+      icon.classList.replace("fa-moon", "fa-sun");
+    }
+  } else {
+    document.body.classList.add("dark-mode");
+    if (icon) {
+      icon.classList.replace("fa-sun", "fa-moon");
+    }
+  }
+  document.documentElement.classList.remove("_theme_light_pending");
+
+  // Botón toggle
+  var btn = document.getElementById("btn-toggle-darkmode");
+  if (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      var icon = document.getElementById("icon-darkmode");
+      if (document.body.classList.contains("dark-mode")) {
+        document.body.classList.remove("dark-mode");
+        localStorage.setItem("pos_theme", "light");
+        if (icon) {
+          icon.classList.replace("fa-moon", "fa-sun");
+        }
+      } else {
+        document.body.classList.add("dark-mode");
+        localStorage.setItem("pos_theme", "dark");
+        if (icon) {
+          icon.classList.replace("fa-sun", "fa-moon");
+        }
+      }
+    });
+  }
 });
 
 // ============ Auth Storage ============
