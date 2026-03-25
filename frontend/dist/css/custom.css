@@ -62,3 +62,10 @@ body:not(.dark-mode) .form-control:focus {
   color: #495057 !important;
   background-color: #fff !important;
 }
+
+/* ── Login: input-group-text en modo OSCURO ─────────────────────────────── */
+.dark-mode .login-box .input-group-text {
+  background-color: #343a40 !important;
+  border-color: #6c757d !important;
+  color: #adb5bd !important;
+}

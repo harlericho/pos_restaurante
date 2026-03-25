@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="../dist/css/adminlte.min.css" />
     <!-- Favicon icono -->
     <link rel="icon" href="../dist/img/favicon.ico" type="image/png" />
+    <link rel="stylesheet" href="../dist/css/custom.css" />
   </head>
   <body class="hold-transition login-page">
     <div class="login-box">
@@ -33,7 +34,7 @@
             class="mb-2"
             style="width: 180px"
           />
-          <a href="" class="h1"><b>Soluciones</b>ITEC</a>
+          <h1 class="h1"><b>Soluciones</b>ITEC</h1>
           <p class="login-box-msg">Sistema de Pos Restaurante</p>
         </div>
         <div class="card-body">
@@ -64,8 +65,13 @@
                 autocomplete="current-password"
               />
               <div class="input-group-append">
-                <div class="input-group-text">
-                  <span class="fas fa-lock"></span>
+                <div
+                  class="input-group-text"
+                  id="btn-toggle-pass"
+                  title="Mostrar/ocultar contraseña"
+                  style="cursor: pointer"
+                >
+                  <i class="fas fa-eye" id="icon-toggle-pass"></i>
                 </div>
               </div>
             </div>
@@ -124,5 +130,21 @@
     <!-- POS Scripts -->
     <script src="../utils/api.js"></script>
     <script src="../utils/login.js"></script>
+    <script>
+      document
+        .getElementById("btn-toggle-pass")
+        .addEventListener("click", function () {
+          var input = document.getElementById("password");
+          var icon = document.getElementById("icon-toggle-pass");
+          if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+          } else {
+            input.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+          }
+          input.focus();
+        });
+    </script>
   </body>
 </html>
