@@ -63,11 +63,29 @@ class VentaController
       Response::json(409, ['error' => 'El pedido no tiene ítems para cobrar']);
     }
 
+    // Calcular IVA desde la configuración
+    require_once __DIR__ . '/../models/FacturaConfigModel.php';
+    $facturaConfig  = new FacturaConfigModel();
+    $cfg            = $facturaConfig->getConfig();
+    $ivaPct         = (float) ($cfg['iva_porcentaje'] ?? 0);
+    $totalBruto     = (float) $pedido['total'];
+
+    if ($ivaPct > 0) {
+      $subtotalBase = round($totalBruto / (1 + $ivaPct / 100), 2);
+      $ivaValor     = round($totalBruto - $subtotalBase, 2);
+    } else {
+      $subtotalBase = $totalBruto;
+      $ivaValor     = 0.00;
+    }
+
     $ventaId = $this->model->create([
-      'pedido_id'   => (int) $pedidoId,
-      'cliente_id'  => $clienteId,
-      'total'       => (float) $pedido['total'],
-      'metodo_pago' => $metodoPago,
+      'pedido_id'      => (int) $pedidoId,
+      'cliente_id'     => $clienteId,
+      'total'          => $totalBruto,
+      'subtotal_base'  => $subtotalBase,
+      'iva_valor'      => $ivaValor,
+      'iva_porcentaje' => $ivaPct,
+      'metodo_pago'    => $metodoPago,
     ]);
 
     Response::json(201, [

@@ -61,9 +61,18 @@ class VentaModel
 
       $clienteId = $data['cliente_id'] ?? null;
       $stmt = $this->db->prepare(
-        "INSERT INTO ventas (pedido_id, cliente_id, numero_factura, total, metodo_pago) VALUES (?, ?, ?, ?, ?)"
+        "INSERT INTO ventas (pedido_id, cliente_id, numero_factura, total, subtotal_base, iva_valor, iva_porcentaje, metodo_pago) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       );
-      $stmt->execute([$data['pedido_id'], $clienteId, $numeroFactura, $data['total'], $data['metodo_pago']]);
+      $stmt->execute([
+        $data['pedido_id'],
+        $clienteId,
+        $numeroFactura,
+        $data['total'],
+        $data['subtotal_base'] ?? $data['total'],
+        $data['iva_valor'] ?? 0,
+        $data['iva_porcentaje'] ?? 0,
+        $data['metodo_pago'],
+      ]);
       $ventaId = (int) $this->db->lastInsertId();
 
       // Cerrar el pedido

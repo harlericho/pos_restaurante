@@ -23,12 +23,19 @@ class FacturaConfigModel
     return $row;
   }
 
-  public function updateConfig(string $establecimiento, string $puntoEmision): void
+  public function updateConfig(string $establecimiento, string $puntoEmision, float $ivaPorcentaje = null): void
   {
-    $stmt = $this->db->prepare(
-      "UPDATE factura_config SET establecimiento = ?, punto_emision = ? WHERE id = 1"
-    );
-    $stmt->execute([$establecimiento, $puntoEmision]);
+    if ($ivaPorcentaje !== null) {
+      $stmt = $this->db->prepare(
+        "UPDATE factura_config SET establecimiento = ?, punto_emision = ?, iva_porcentaje = ? WHERE id = 1"
+      );
+      $stmt->execute([$establecimiento, $puntoEmision, $ivaPorcentaje]);
+    } else {
+      $stmt = $this->db->prepare(
+        "UPDATE factura_config SET establecimiento = ?, punto_emision = ? WHERE id = 1"
+      );
+      $stmt->execute([$establecimiento, $puntoEmision]);
+    }
   }
 
   /**

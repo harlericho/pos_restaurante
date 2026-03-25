@@ -40,7 +40,13 @@ class FacturaConfigController
       Response::json(422, ['error' => 'Los códigos deben ser numéricos']);
     }
 
-    $this->model->updateConfig($estab, $punto);
+    // IVA: opcional, default 0
+    $ivaPct = isset($body['iva_porcentaje']) ? (float) $body['iva_porcentaje'] : null;
+    if ($ivaPct !== null && ($ivaPct < 0 || $ivaPct > 100)) {
+      Response::json(422, ['error' => 'El porcentaje de IVA debe estar entre 0 y 100']);
+    }
+
+    $this->model->updateConfig($estab, $punto, $ivaPct);
     Response::json(200, [
       'mensaje' => 'Configuración actualizada',
       'data'    => $this->model->getConfig(),

@@ -55,6 +55,9 @@ async function loadConfig() {
     document.getElementById("cfg-punto-emision").value =
       cfg.punto_emision || "001";
     document.getElementById("cfg-secuencial").value = cfg.secuencial || 0;
+    document.getElementById("cfg-iva").value = parseFloat(
+      cfg.iva_porcentaje ?? 0,
+    ).toFixed(2);
 
     updatePreview();
   } catch (err) {
@@ -96,10 +99,14 @@ async function saveConfig() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Guardando...';
 
+  var iva = parseFloat(document.getElementById("cfg-iva").value || "0");
+  if (isNaN(iva) || iva < 0 || iva > 100) iva = 0;
+
   try {
     await FacturaConfigAPI.update({
       establecimiento: estab,
       punto_emision: punto,
+      iva_porcentaje: iva,
     });
     showAlert("success", "Configuración guardada correctamente.");
     updatePreview();

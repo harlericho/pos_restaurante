@@ -199,6 +199,14 @@ END$$
 DELIMITER ;
 
 -- ============================================================
+-- MÓDULO IVA
+-- ============================================================
+ALTER TABLE factura_config ADD COLUMN iva_porcentaje DECIMAL(5,2) NOT NULL DEFAULT 15.00;
+ALTER TABLE ventas ADD COLUMN subtotal_base DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER total;
+ALTER TABLE ventas ADD COLUMN iva_valor DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER subtotal_base;
+ALTER TABLE ventas ADD COLUMN iva_porcentaje DECIMAL(5,2) NOT NULL DEFAULT 0.00 AFTER iva_valor;
+
+-- ============================================================
 -- DATOS INICIALES
 -- ============================================================
 

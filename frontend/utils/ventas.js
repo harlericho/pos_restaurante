@@ -85,6 +85,9 @@ document.addEventListener("DOMContentLoaded", function () {
           cliente_telefono: btn.dataset.telefono,
           cliente_email: btn.dataset.email,
           metodo_pago: btn.dataset.metodo,
+          subtotal_base: btn.dataset.subtotalBase,
+          iva_valor: btn.dataset.ivaValor,
+          iva_porcentaje: btn.dataset.ivaPct,
         };
         _currentVenta = ventaData;
         generarFacturaPDF();
@@ -368,6 +371,15 @@ async function loadReporte() {
           '" ' +
           'data-metodo="' +
           escapeHtml(v.metodo_pago || "") +
+          '" ' +
+          'data-subtotal-base="' +
+          parseFloat(v.subtotal_base || v.total || 0).toFixed(2) +
+          '" ' +
+          'data-iva-valor="' +
+          parseFloat(v.iva_valor || 0).toFixed(2) +
+          '" ' +
+          'data-iva-pct="' +
+          parseFloat(v.iva_porcentaje || 0).toFixed(2) +
           '" ' +
           'title="Ver Factura PDF"><i class="fas fa-file-pdf"></i></button></td>' +
           "</tr>"
@@ -908,50 +920,56 @@ async function generarFacturaPDF() {
               width: 210,
               table: {
                 widths: ["*", 80],
-                body: [
-                  [
-                    { text: "Subtotal sin impuestos", fontSize: 9, bold: true },
-                    {
-                      text: "$" + total,
-                      fontSize: 9,
-                      alignment: "right",
-                    },
-                  ],
-                  [
-                    {
-                      text: "Subtotal Exento IVA",
-                      fontSize: 9,
-                      bold: true,
-                    },
-                    { text: "$0.00", fontSize: 9, alignment: "right" },
-                  ],
-                  [
-                    { text: "Descuento 0%", fontSize: 9, bold: true },
-                    { text: "$0.00", fontSize: 9, alignment: "right" },
-                  ],
-                  [
-                    { text: "ICE", fontSize: 9, bold: true },
-                    { text: "$0.00", fontSize: 9, alignment: "right" },
-                  ],
-                  [
-                    { text: "IVA 0.00%", fontSize: 9, bold: true },
-                    { text: "$0.00", fontSize: 9, alignment: "right" },
-                  ],
-                  [
-                    {
-                      text: "VALOR TOTAL",
-                      fontSize: 10,
-                      bold: true,
-                    },
-                    {
-                      text: "$" + total,
-                      fontSize: 10,
-                      bold: true,
-                      color: "#1a56db",
-                      alignment: "right",
-                    },
-                  ],
-                ],
+                body: (function () {
+                  var ivaPct = parseFloat(_currentVenta.iva_porcentaje || 0);
+                  var ivaValor = parseFloat(
+                    _currentVenta.iva_valor || 0,
+                  ).toFixed(2);
+                  var subBase = parseFloat(
+                    _currentVenta.subtotal_base || _currentVenta.total || 0,
+                  ).toFixed(2);
+                  var ivaLabel = "IVA " + ivaPct.toFixed(2) + "%";
+                  return [
+                    [
+                      {
+                        text: "Subtotal sin impuestos",
+                        fontSize: 9,
+                        bold: true,
+                      },
+                      { text: "$" + subBase, fontSize: 9, alignment: "right" },
+                    ],
+                    [
+                      { text: "Subtotal Exento IVA", fontSize: 9, bold: true },
+                      {
+                        text: ivaPct > 0 ? "$0.00" : "$" + subBase,
+                        fontSize: 9,
+                        alignment: "right",
+                      },
+                    ],
+                    [
+                      { text: "Descuento 0%", fontSize: 9, bold: true },
+                      { text: "$0.00", fontSize: 9, alignment: "right" },
+                    ],
+                    [
+                      { text: "ICE", fontSize: 9, bold: true },
+                      { text: "$0.00", fontSize: 9, alignment: "right" },
+                    ],
+                    [
+                      { text: ivaLabel, fontSize: 9, bold: true },
+                      { text: "$" + ivaValor, fontSize: 9, alignment: "right" },
+                    ],
+                    [
+                      { text: "VALOR TOTAL", fontSize: 10, bold: true },
+                      {
+                        text: "$" + total,
+                        fontSize: 10,
+                        bold: true,
+                        color: "#1a56db",
+                        alignment: "right",
+                      },
+                    ],
+                  ];
+                })(),
               },
               layout: "lightHorizontalLines",
             },
