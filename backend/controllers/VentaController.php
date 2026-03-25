@@ -94,6 +94,43 @@ class VentaController
     ]);
   }
 
+  public function sendEmail(object $tokenData, string $id): void
+  {
+    $venta = $this->model->findById((int) $id);
+    if (!$venta) {
+      Response::json(404, ['error' => 'Venta no encontrada']);
+    }
+
+    $body     = json_decode(file_get_contents('php://input'), true) ?? [];
+    $email    = trim($body['email']      ?? '');
+    $nombre   = trim($body['nombre']     ?? 'Cliente');
+    $pdfB64   = trim($body['pdf_base64'] ?? '');
+
+    if ($email === '') {
+      Response::json(422, ['error' => 'El campo email es requerido']);
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      Response::json(422, ['error' => 'El email no tiene un formato válido']);
+    }
+    if ($pdfB64 === '') {
+      Response::json(422, ['error' => 'El PDF en base64 es requerido']);
+    }
+
+    require_once __DIR__ . '/../helpers/MailHelper.php';
+
+    try {
+      MailHelper::sendFactura(
+        $email,
+        $nombre,
+        $venta['numero_factura'] ?? 'S/N',
+        $pdfB64
+      );
+      Response::json(200, ['mensaje' => 'Factura enviada correctamente a ' . $email]);
+    } catch (\Throwable $e) {
+      Response::json(500, ['error' => 'No se pudo enviar el correo: ' . $e->getMessage()]);
+    }
+  }
+
   public function reporte(object $tokenData): void
   {
     AuthMiddleware::requiereRol($tokenData, 'admin');

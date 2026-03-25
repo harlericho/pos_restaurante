@@ -392,7 +392,9 @@
                           <th style="width: 130px">Método de pago</th>
                           <th style="width: 170px">Nº Factura</th>
                           <th style="width: 150px">Fecha</th>
-                          <th style="width: 70px" class="text-center">PDF</th>
+                          <th style="width: 110px" class="text-center">
+                            Acciones
+                          </th>
                         </tr>
                       </thead>
                       <tbody id="tbody-ventas">
@@ -684,10 +686,79 @@
             </button>
             <button
               type="button"
+              class="btn btn-info px-4 mr-2 d-none"
+              id="btn-enviar-email-factura"
+            >
+              <i class="fas fa-envelope mr-1"></i> Enviar por Email
+            </button>
+            <button
+              type="button"
               class="btn btn-success px-4"
               data-dismiss="modal"
             >
               <i class="fas fa-check mr-1"></i> Aceptar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Enviar factura por email -->
+    <div
+      class="modal fade"
+      id="modal-enviar-email"
+      tabindex="-1"
+      role="dialog"
+      data-backdrop="true"
+    >
+      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-info">
+            <h5 class="modal-title text-white">
+              <i class="fas fa-envelope mr-2"></i>Enviar Factura por Email
+            </h5>
+            <button
+              type="button"
+              class="close text-white"
+              data-dismiss="modal"
+              aria-label="Cerrar"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted small mb-3">
+              Factura: <strong id="email-modal-factura">—</strong>
+            </p>
+            <div class="form-group mb-0">
+              <label for="email-modal-input" class="font-weight-bold"
+                >Correo electrónico</label
+              >
+              <input
+                type="email"
+                class="form-control"
+                id="email-modal-input"
+                placeholder="cliente@ejemplo.com"
+              />
+              <small class="form-text text-muted"
+                >Puede cambiar el correo antes de enviar.</small
+              >
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-info px-4"
+              id="btn-confirmar-envio-email"
+            >
+              <i class="fas fa-paper-plane mr-1"></i> Enviar
             </button>
           </div>
         </div>

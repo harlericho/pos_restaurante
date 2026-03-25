@@ -275,6 +275,9 @@ var VentasAPI = {
       "/api/ventas/reporte?desde=" + desde + "&hasta=" + hasta,
     );
   },
+  sendEmail: function (id, data) {
+    return request("POST", "/api/ventas/" + id + "/email", data);
+  },
 };
 
 var ClientesAPI = {

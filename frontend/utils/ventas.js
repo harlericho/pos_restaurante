@@ -47,6 +47,22 @@ document.addEventListener("DOMContentLoaded", function () {
     generarFacturaPDF();
   });
 
+  // ── Enviar factura por email (abre modal) ─────────────────────────────
+  var btnEmailFactura = el("btn-enviar-email-factura");
+  if (btnEmailFactura) {
+    btnEmailFactura.addEventListener("click", function () {
+      abrirModalEmail(_currentVenta);
+    });
+  }
+
+  // ── Modal enviar email: botón confirmar ───────────────────────────────
+  var btnConfirmar = el("btn-confirmar-envio-email");
+  if (btnConfirmar) {
+    btnConfirmar.addEventListener("click", function () {
+      _enviarDesdeModal();
+    });
+  }
+
   // ── Reporte (admin) ───────────────────────────────────────────────────
   if (_isAdmin) {
     // Establecer fechas por defecto: hoy (usando fecha local, no UTC)
@@ -69,11 +85,13 @@ document.addEventListener("DOMContentLoaded", function () {
     initDataTable("#table-ventas", 8);
     _reporteCargado = true;
 
-    // Delegar click en botones PDF del reporte
+    // Delegar click en botones del reporte (PDF y email)
     document
       .getElementById("tbody-ventas")
       .addEventListener("click", function (e) {
-        var btn = e.target.closest(".btn-pdf-reporte");
+        var btnPdf = e.target.closest(".btn-pdf-reporte");
+        var btnEmail = e.target.closest(".btn-email-reporte");
+        var btn = btnPdf || btnEmail;
         if (!btn) return;
         var ventaData = {
           id: btn.dataset.ventaId,
@@ -90,7 +108,11 @@ document.addEventListener("DOMContentLoaded", function () {
           iva_porcentaje: btn.dataset.ivaPct,
         };
         _currentVenta = ventaData;
-        generarFacturaPDF();
+        if (btnPdf) {
+          generarFacturaPDF();
+        } else {
+          abrirModalEmail(ventaData);
+        }
       });
   }
 
@@ -228,6 +250,21 @@ async function registrarCobro() {
     document.getElementById("comp-metodo").textContent =
       metodosLabel[venta.metodo_pago] || venta.metodo_pago || "—";
     _currentVenta = venta;
+
+    // Mostrar/ocultar botón de email según si el cliente tiene correo
+    var emailBtn = document.getElementById("btn-enviar-email-factura");
+    if (emailBtn) {
+      emailBtn.disabled = false;
+      emailBtn.className = "btn btn-info px-4 mr-2";
+      emailBtn.innerHTML =
+        '<i class="fas fa-envelope mr-1"></i> Enviar por Email';
+      if (venta.cliente_email) {
+        emailBtn.classList.remove("d-none");
+      } else {
+        emailBtn.classList.add("d-none");
+      }
+    }
+
     $("#modal-comprobante").modal("show");
 
     // Recargar pedidos abiertos
@@ -381,7 +418,45 @@ async function loadReporte() {
           'data-iva-pct="' +
           parseFloat(v.iva_porcentaje || 0).toFixed(2) +
           '" ' +
-          'title="Ver Factura PDF"><i class="fas fa-file-pdf"></i></button></td>' +
+          'title="Ver Factura PDF"><i class="fas fa-file-pdf"></i></button>' +
+          '<button class="btn btn-xs btn-outline-info btn-email-reporte ml-1" ' +
+          'data-venta-id="' +
+          v.id +
+          '" ' +
+          'data-pedido-id="' +
+          (v.pedido_id || "") +
+          '" ' +
+          'data-factura="' +
+          escapeHtml(v.numero_factura || "") +
+          '" ' +
+          'data-total="' +
+          parseFloat(v.total || 0).toFixed(2) +
+          '" ' +
+          'data-cliente="' +
+          escapeHtml(v.cliente_nombre || "Consumidor Final") +
+          '" ' +
+          'data-ci="' +
+          escapeHtml(v.cliente_ci_nit || "") +
+          '" ' +
+          'data-telefono="' +
+          escapeHtml(v.cliente_telefono || "") +
+          '" ' +
+          'data-email="' +
+          escapeHtml(v.cliente_email || "") +
+          '" ' +
+          'data-metodo="' +
+          escapeHtml(v.metodo_pago || "") +
+          '" ' +
+          'data-subtotal-base="' +
+          parseFloat(v.subtotal_base || v.total || 0).toFixed(2) +
+          '" ' +
+          'data-iva-valor="' +
+          parseFloat(v.iva_valor || 0).toFixed(2) +
+          '" ' +
+          'data-iva-pct="' +
+          parseFloat(v.iva_porcentaje || 0).toFixed(2) +
+          '" ' +
+          'title="Enviar por Email"><i class="fas fa-envelope"></i></button></td>' +
           "</tr>"
         );
       })
@@ -650,7 +725,360 @@ function _getClienteIdCobrar() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// Generar factura PDF (pdfmake local)
+// Construye el documento pdfmake para la venta actual
+// ═══════════════════════════════════════════════════════════════════════
+async function _buildPdfDoc() {
+  if (!_currentVenta) return null;
+
+  var empResp = await EmpresaAPI.get();
+  var empresa = empResp.data || {};
+
+  var pedResp = await PedidosAPI.getById(_currentVenta.pedido_id);
+  var pedido = pedResp.data || {};
+  var detalle = pedido.detalle || [];
+
+  // Cargar logo como base64
+  var logoBase64 = null;
+  try {
+    var logoResp = await fetch("../dist/img/logoempresa.png");
+    if (logoResp.ok) {
+      var logoBlob = await logoResp.blob();
+      logoBase64 = await new Promise(function (resolve) {
+        var reader = new FileReader();
+        reader.onloadend = function () {
+          resolve(reader.result);
+        };
+        reader.readAsDataURL(logoBlob);
+      });
+    }
+  } catch (_) {
+    /* logo opcional, continúa sin él */
+  }
+
+  var metodosLabel = {
+    efectivo: "Efectivo",
+    tarjeta: "Tarjeta",
+    transferencia: "Transferencia",
+  };
+  var fechaVenta = new Date().toLocaleDateString("es-EC");
+  var total = parseFloat(_currentVenta.total || 0).toFixed(2);
+
+  var productoRows = detalle.map(function (item) {
+    return [
+      {
+        text: item.producto_codigo ? String(item.producto_codigo) : "—",
+        fontSize: 9,
+      },
+      { text: String(item.cantidad), fontSize: 9, alignment: "center" },
+      { text: item.producto_nombre || "—", fontSize: 9 },
+      {
+        text: "$" + parseFloat(item.precio || 0).toFixed(2),
+        fontSize: 9,
+        alignment: "right",
+      },
+      { text: "$0.00", fontSize: 9, alignment: "right" },
+      {
+        text: "$" + parseFloat(item.subtotal || 0).toFixed(2),
+        fontSize: 9,
+        alignment: "right",
+      },
+    ];
+  });
+
+  var docDefinition = {
+    pageSize: "A4",
+    pageMargins: [40, 40, 40, 60],
+    content: [
+      // ── Encabezado: logo izquierda | datos empresa + factura derecha ─
+      {
+        columns: [
+          // Izquierda: solo logo
+          logoBase64
+            ? { image: logoBase64, width: 150, margin: [0, -20, 0, 0] }
+            : { text: "", width: 10 },
+          // Derecha: nombre, RUC, dirección, tel, correo, FACTURA, No.
+          {
+            width: "*",
+            alignment: "right",
+            margin: [16, 0, 0, 0],
+            stack: [
+              {
+                text: empresa.nombre || "Mi Empresa",
+                fontSize: 16,
+                bold: true,
+                color: "#222",
+              },
+              empresa.ruc
+                ? { text: "RUC: " + empresa.ruc, fontSize: 9, color: "#555" }
+                : {},
+              empresa.direccion
+                ? { text: empresa.direccion, fontSize: 9, color: "#555" }
+                : {},
+              empresa.telefono
+                ? {
+                    text: "Tel: " + empresa.telefono,
+                    fontSize: 9,
+                    color: "#555",
+                  }
+                : {},
+              empresa.correo
+                ? { text: empresa.correo, fontSize: 9, color: "#555" }
+                : {},
+              {
+                text: "FACTURA",
+                fontSize: 22,
+                bold: true,
+                color: "#1a56db",
+                margin: [0, 6, 0, 0],
+              },
+              {
+                text: "No. " + (_currentVenta.numero_factura || ""),
+                fontSize: 11,
+                bold: true,
+              },
+            ],
+          },
+        ],
+        margin: [0, 0, 0, 10],
+      },
+      {
+        canvas: [
+          {
+            type: "line",
+            x1: 0,
+            y1: 0,
+            x2: 515,
+            y2: 0,
+            lineWidth: 1,
+            lineColor: "#dee2e6",
+          },
+        ],
+        margin: [0, 0, 0, 8],
+      },
+      // ── Datos del cliente ────────────────────────────────────────────
+      {
+        table: {
+          widths: ["*", "*", "*"],
+          body: [
+            [
+              {
+                text: [
+                  { text: "Razón Social: ", bold: true },
+                  _currentVenta.cliente_nombre || "Consumidor Final",
+                ],
+                fontSize: 9,
+              },
+              {
+                text: [
+                  { text: "RUC / CI: ", bold: true },
+                  _currentVenta.cliente_ci_nit || "—",
+                ],
+                fontSize: 9,
+              },
+              {
+                text: [
+                  { text: "Condición de Pago: ", bold: true },
+                  metodosLabel[_currentVenta.metodo_pago] ||
+                    _currentVenta.metodo_pago ||
+                    "—",
+                ],
+                fontSize: 9,
+              },
+            ],
+            [
+              {
+                text: [
+                  { text: "Teléfono: ", bold: true },
+                  _currentVenta.cliente_telefono || "—",
+                ],
+                fontSize: 9,
+              },
+              {
+                text: [{ text: "Fecha: ", bold: true }, fechaVenta],
+                fontSize: 9,
+              },
+              {
+                text: [
+                  { text: "Email: ", bold: true },
+                  _currentVenta.cliente_email || "—",
+                ],
+                fontSize: 9,
+              },
+            ],
+          ],
+        },
+        layout: "lightHorizontalLines",
+        margin: [0, 0, 0, 10],
+      },
+      // ── Tabla de productos ───────────────────────────────────────────
+      {
+        table: {
+          headerRows: 1,
+          widths: [45, 30, "*", 65, 60, 65],
+          body: [
+            [
+              {
+                text: "Cód.",
+                bold: true,
+                fontSize: 9,
+                fillColor: "#f1f3f5",
+              },
+              {
+                text: "Cant.",
+                bold: true,
+                fontSize: 9,
+                fillColor: "#f1f3f5",
+                alignment: "center",
+              },
+              {
+                text: "Descripción",
+                bold: true,
+                fontSize: 9,
+                fillColor: "#f1f3f5",
+              },
+              {
+                text: "P. Unitario",
+                bold: true,
+                fontSize: 9,
+                fillColor: "#f1f3f5",
+                alignment: "right",
+              },
+              {
+                text: "Descuento",
+                bold: true,
+                fontSize: 9,
+                fillColor: "#f1f3f5",
+                alignment: "right",
+              },
+              {
+                text: "P. Total",
+                bold: true,
+                fontSize: 9,
+                fillColor: "#f1f3f5",
+                alignment: "right",
+              },
+            ],
+          ].concat(
+            productoRows.length
+              ? productoRows
+              : [
+                  [
+                    {
+                      text: "Sin productos",
+                      colSpan: 6,
+                      alignment: "center",
+                      fontSize: 9,
+                      color: "#999",
+                    },
+                    {},
+                    {},
+                    {},
+                    {},
+                    {},
+                  ],
+                ],
+          ),
+        },
+        layout: "lightHorizontalLines",
+        margin: [0, 0, 0, 10],
+      },
+      // ── Totales ──────────────────────────────────────────────────────
+      {
+        columns: [
+          { width: "*", text: "" },
+          {
+            width: 210,
+            table: {
+              widths: ["*", 80],
+              body: (function () {
+                var ivaPct = parseFloat(_currentVenta.iva_porcentaje || 0);
+                var ivaValor = parseFloat(_currentVenta.iva_valor || 0).toFixed(
+                  2,
+                );
+                var subBase = parseFloat(
+                  _currentVenta.subtotal_base || _currentVenta.total || 0,
+                ).toFixed(2);
+                var ivaLabel = "IVA " + ivaPct.toFixed(2) + "%";
+                return [
+                  [
+                    {
+                      text: "Subtotal sin impuestos",
+                      fontSize: 9,
+                      bold: true,
+                    },
+                    { text: "$" + subBase, fontSize: 9, alignment: "right" },
+                  ],
+                  [
+                    { text: "Subtotal Exento IVA", fontSize: 9, bold: true },
+                    {
+                      text: ivaPct > 0 ? "$0.00" : "$" + subBase,
+                      fontSize: 9,
+                      alignment: "right",
+                    },
+                  ],
+                  [
+                    { text: "Descuento 0%", fontSize: 9, bold: true },
+                    { text: "$0.00", fontSize: 9, alignment: "right" },
+                  ],
+                  [
+                    { text: "ICE", fontSize: 9, bold: true },
+                    { text: "$0.00", fontSize: 9, alignment: "right" },
+                  ],
+                  [
+                    { text: ivaLabel, fontSize: 9, bold: true },
+                    { text: "$" + ivaValor, fontSize: 9, alignment: "right" },
+                  ],
+                  [
+                    { text: "VALOR TOTAL", fontSize: 10, bold: true },
+                    {
+                      text: "$" + total,
+                      fontSize: 10,
+                      bold: true,
+                      color: "#1a56db",
+                      alignment: "right",
+                    },
+                  ],
+                ];
+              })(),
+            },
+            layout: "lightHorizontalLines",
+          },
+        ],
+        margin: [0, 0, 0, 16],
+      },
+      // ── Pie de página ────────────────────────────────────────────────
+      {
+        text: "TÉRMINOS Y CONDICIONES",
+        fontSize: 9,
+        bold: true,
+        alignment: "center",
+        margin: [0, 0, 0, 3],
+      },
+      {
+        text: "El proveedor declara que los bienes o servicios entregados cumplen con las especificaciones acordadas. Este documento es válido como comprobante de pago.",
+        fontSize: 8,
+        color: "#6c757d",
+        alignment: "center",
+      },
+      {
+        text: "Copyright@ SolucionesITEC",
+        fontSize: 8,
+        color: "#6c757d",
+        alignment: "center",
+        margin: [0, 4, 0, 0],
+      },
+    ],
+    defaultStyle: {
+      font: "Roboto",
+      fontSize: 10,
+    },
+  };
+
+  return pdfMake.createPdf(docDefinition);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Generar factura PDF (descarga / abre en nueva pestaña)
 // ═══════════════════════════════════════════════════════════════════════
 async function generarFacturaPDF() {
   if (!_currentVenta) return;
@@ -660,356 +1088,90 @@ async function generarFacturaPDF() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Generando...';
 
   try {
-    var empResp = await EmpresaAPI.get();
-    var empresa = empResp.data || {};
-
-    var pedResp = await PedidosAPI.getById(_currentVenta.pedido_id);
-    var pedido = pedResp.data || {};
-    var detalle = pedido.detalle || [];
-
-    // Cargar logo como base64
-    var logoBase64 = null;
-    try {
-      var logoResp = await fetch("../dist/img/logoempresa.png");
-      if (logoResp.ok) {
-        var logoBlob = await logoResp.blob();
-        logoBase64 = await new Promise(function (resolve) {
-          var reader = new FileReader();
-          reader.onloadend = function () {
-            resolve(reader.result);
-          };
-          reader.readAsDataURL(logoBlob);
-        });
-      }
-    } catch (_) {
-      /* logo opcional, continúa sin él */
-    }
-
-    var metodosLabel = {
-      efectivo: "Efectivo",
-      tarjeta: "Tarjeta",
-      transferencia: "Transferencia",
-    };
-    var fechaVenta = new Date().toLocaleDateString("es-EC");
-    var total = parseFloat(_currentVenta.total || 0).toFixed(2);
-
-    var productoRows = detalle.map(function (item) {
-      return [
-        {
-          text: item.producto_codigo ? String(item.producto_codigo) : "—",
-          fontSize: 9,
-        },
-        { text: String(item.cantidad), fontSize: 9, alignment: "center" },
-        { text: item.producto_nombre || "—", fontSize: 9 },
-        {
-          text: "$" + parseFloat(item.precio || 0).toFixed(2),
-          fontSize: 9,
-          alignment: "right",
-        },
-        { text: "$0.00", fontSize: 9, alignment: "right" },
-        {
-          text: "$" + parseFloat(item.subtotal || 0).toFixed(2),
-          fontSize: 9,
-          alignment: "right",
-        },
-      ];
-    });
-
-    var docDefinition = {
-      pageSize: "A4",
-      pageMargins: [40, 40, 40, 60],
-      content: [
-        // ── Encabezado: logo izquierda | datos empresa + factura derecha ─
-        {
-          columns: [
-            // Izquierda: solo logo
-            logoBase64
-              ? { image: logoBase64, width: 150, margin: [0, -20, 0, 0] }
-              : { text: "", width: 10 },
-            // Derecha: nombre, RUC, dirección, tel, correo, FACTURA, No.
-            {
-              width: "*",
-              alignment: "right",
-              margin: [16, 0, 0, 0],
-              stack: [
-                {
-                  text: empresa.nombre || "Mi Empresa",
-                  fontSize: 16,
-                  bold: true,
-                  color: "#222",
-                },
-                empresa.ruc
-                  ? { text: "RUC: " + empresa.ruc, fontSize: 9, color: "#555" }
-                  : {},
-                empresa.direccion
-                  ? { text: empresa.direccion, fontSize: 9, color: "#555" }
-                  : {},
-                empresa.telefono
-                  ? {
-                      text: "Tel: " + empresa.telefono,
-                      fontSize: 9,
-                      color: "#555",
-                    }
-                  : {},
-                empresa.correo
-                  ? { text: empresa.correo, fontSize: 9, color: "#555" }
-                  : {},
-                {
-                  text: "FACTURA",
-                  fontSize: 22,
-                  bold: true,
-                  color: "#1a56db",
-                  margin: [0, 6, 0, 0],
-                },
-                {
-                  text: "No. " + (_currentVenta.numero_factura || ""),
-                  fontSize: 11,
-                  bold: true,
-                },
-              ],
-            },
-          ],
-          margin: [0, 0, 0, 10],
-        },
-        {
-          canvas: [
-            {
-              type: "line",
-              x1: 0,
-              y1: 0,
-              x2: 515,
-              y2: 0,
-              lineWidth: 1,
-              lineColor: "#dee2e6",
-            },
-          ],
-          margin: [0, 0, 0, 8],
-        },
-        // ── Datos del cliente ────────────────────────────────────────────
-        {
-          table: {
-            widths: ["*", "*", "*"],
-            body: [
-              [
-                {
-                  text: [
-                    { text: "Razón Social: ", bold: true },
-                    _currentVenta.cliente_nombre || "Consumidor Final",
-                  ],
-                  fontSize: 9,
-                },
-                {
-                  text: [
-                    { text: "RUC / CI: ", bold: true },
-                    _currentVenta.cliente_ci_nit || "—",
-                  ],
-                  fontSize: 9,
-                },
-                {
-                  text: [
-                    { text: "Condición de Pago: ", bold: true },
-                    metodosLabel[_currentVenta.metodo_pago] ||
-                      _currentVenta.metodo_pago ||
-                      "—",
-                  ],
-                  fontSize: 9,
-                },
-              ],
-              [
-                {
-                  text: [
-                    { text: "Teléfono: ", bold: true },
-                    _currentVenta.cliente_telefono || "—",
-                  ],
-                  fontSize: 9,
-                },
-                {
-                  text: [{ text: "Fecha: ", bold: true }, fechaVenta],
-                  fontSize: 9,
-                },
-                {
-                  text: [
-                    { text: "Email: ", bold: true },
-                    _currentVenta.cliente_email || "—",
-                  ],
-                  fontSize: 9,
-                },
-              ],
-            ],
-          },
-          layout: "lightHorizontalLines",
-          margin: [0, 0, 0, 10],
-        },
-        // ── Tabla de productos ───────────────────────────────────────────
-        {
-          table: {
-            headerRows: 1,
-            widths: [45, 30, "*", 65, 60, 65],
-            body: [
-              [
-                {
-                  text: "Cód.",
-                  bold: true,
-                  fontSize: 9,
-                  fillColor: "#f1f3f5",
-                },
-                {
-                  text: "Cant.",
-                  bold: true,
-                  fontSize: 9,
-                  fillColor: "#f1f3f5",
-                  alignment: "center",
-                },
-                {
-                  text: "Descripción",
-                  bold: true,
-                  fontSize: 9,
-                  fillColor: "#f1f3f5",
-                },
-                {
-                  text: "P. Unitario",
-                  bold: true,
-                  fontSize: 9,
-                  fillColor: "#f1f3f5",
-                  alignment: "right",
-                },
-                {
-                  text: "Descuento",
-                  bold: true,
-                  fontSize: 9,
-                  fillColor: "#f1f3f5",
-                  alignment: "right",
-                },
-                {
-                  text: "P. Total",
-                  bold: true,
-                  fontSize: 9,
-                  fillColor: "#f1f3f5",
-                  alignment: "right",
-                },
-              ],
-            ].concat(
-              productoRows.length
-                ? productoRows
-                : [
-                    [
-                      {
-                        text: "Sin productos",
-                        colSpan: 6,
-                        alignment: "center",
-                        fontSize: 9,
-                        color: "#999",
-                      },
-                      {},
-                      {},
-                      {},
-                      {},
-                      {},
-                    ],
-                  ],
-            ),
-          },
-          layout: "lightHorizontalLines",
-          margin: [0, 0, 0, 10],
-        },
-        // ── Totales ──────────────────────────────────────────────────────
-        {
-          columns: [
-            { width: "*", text: "" },
-            {
-              width: 210,
-              table: {
-                widths: ["*", 80],
-                body: (function () {
-                  var ivaPct = parseFloat(_currentVenta.iva_porcentaje || 0);
-                  var ivaValor = parseFloat(
-                    _currentVenta.iva_valor || 0,
-                  ).toFixed(2);
-                  var subBase = parseFloat(
-                    _currentVenta.subtotal_base || _currentVenta.total || 0,
-                  ).toFixed(2);
-                  var ivaLabel = "IVA " + ivaPct.toFixed(2) + "%";
-                  return [
-                    [
-                      {
-                        text: "Subtotal sin impuestos",
-                        fontSize: 9,
-                        bold: true,
-                      },
-                      { text: "$" + subBase, fontSize: 9, alignment: "right" },
-                    ],
-                    [
-                      { text: "Subtotal Exento IVA", fontSize: 9, bold: true },
-                      {
-                        text: ivaPct > 0 ? "$0.00" : "$" + subBase,
-                        fontSize: 9,
-                        alignment: "right",
-                      },
-                    ],
-                    [
-                      { text: "Descuento 0%", fontSize: 9, bold: true },
-                      { text: "$0.00", fontSize: 9, alignment: "right" },
-                    ],
-                    [
-                      { text: "ICE", fontSize: 9, bold: true },
-                      { text: "$0.00", fontSize: 9, alignment: "right" },
-                    ],
-                    [
-                      { text: ivaLabel, fontSize: 9, bold: true },
-                      { text: "$" + ivaValor, fontSize: 9, alignment: "right" },
-                    ],
-                    [
-                      { text: "VALOR TOTAL", fontSize: 10, bold: true },
-                      {
-                        text: "$" + total,
-                        fontSize: 10,
-                        bold: true,
-                        color: "#1a56db",
-                        alignment: "right",
-                      },
-                    ],
-                  ];
-                })(),
-              },
-              layout: "lightHorizontalLines",
-            },
-          ],
-          margin: [0, 0, 0, 16],
-        },
-        // ── Pie de página ────────────────────────────────────────────────
-        {
-          text: "TÉRMINOS Y CONDICIONES",
-          fontSize: 9,
-          bold: true,
-          alignment: "center",
-          margin: [0, 0, 0, 3],
-        },
-        {
-          text: "El proveedor declara que los bienes o servicios entregados cumplen con las especificaciones acordadas. Este documento es válido como comprobante de pago.",
-          fontSize: 8,
-          color: "#6c757d",
-          alignment: "center",
-        },
-        {
-          text: "Copyright@ SolucionesITEC",
-          fontSize: 8,
-          color: "#6c757d",
-          alignment: "center",
-          margin: [0, 4, 0, 0],
-        },
-      ],
-      defaultStyle: {
-        font: "Roboto",
-        fontSize: 10,
-      },
-    };
-
-    pdfMake.createPdf(docDefinition).open();
+    var doc = await _buildPdfDoc();
+    if (doc) doc.open();
   } catch (err) {
     console.error("[generarFacturaPDF]", err);
     showAlert("danger", "Error al generar el PDF de la factura.");
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-file-pdf mr-1"></i> Descargar Factura';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Enviar factura PDF por email — modal con email editable
+// ═══════════════════════════════════════════════════════════════════════
+function abrirModalEmail(ventaData) {
+  if (!ventaData) return;
+  document.getElementById("email-modal-factura").textContent =
+    ventaData.numero_factura || "S/N";
+  var inputEmail = document.getElementById("email-modal-input");
+  inputEmail.value = ventaData.cliente_email || "";
+  inputEmail.classList.remove("is-invalid");
+  var btnConf = document.getElementById("btn-confirmar-envio-email");
+  btnConf.disabled = false;
+  btnConf.className = "btn btn-info px-4";
+  btnConf.innerHTML = '<i class="fas fa-paper-plane mr-1"></i> Enviar';
+  $("#modal-enviar-email").modal("show");
+}
+
+async function _enviarDesdeModal() {
+  if (!_currentVenta) return;
+
+  var inputEmail = document.getElementById("email-modal-input");
+  var email = inputEmail.value.trim();
+
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    inputEmail.classList.add("is-invalid");
+    inputEmail.focus();
+    return;
+  }
+  inputEmail.classList.remove("is-invalid");
+
+  var btnConf = document.getElementById("btn-confirmar-envio-email");
+  btnConf.disabled = true;
+  btnConf.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Enviando...';
+
+  try {
+    var doc = await _buildPdfDoc();
+    if (!doc) throw new Error("No se pudo generar el PDF.");
+
+    var b64 = await new Promise(function (resolve) {
+      doc.getBase64(function (data) {
+        resolve(data);
+      });
+    });
+
+    await VentasAPI.sendEmail(_currentVenta.id, {
+      email: email,
+      nombre: _currentVenta.cliente_nombre || "Cliente",
+      pdf_base64: b64,
+    });
+
+    btnConf.className = "btn btn-success px-4";
+    btnConf.innerHTML = '<i class="fas fa-check mr-1"></i> ¡Enviado!';
+
+    // Actualizar también el botón del comprobante si está visible
+    var btnComp = document.getElementById("btn-enviar-email-factura");
+    if (btnComp && !btnComp.classList.contains("d-none")) {
+      btnComp.disabled = true;
+      btnComp.className = "btn btn-success px-4 mr-2";
+      btnComp.innerHTML = '<i class="fas fa-check mr-1"></i> ¡Enviado!';
+    }
+
+    setTimeout(function () {
+      $("#modal-enviar-email").modal("hide");
+    }, 1500);
+  } catch (err) {
+    console.error("[_enviarDesdeModal]", err);
+    var msg =
+      (err.data && err.data.error) ||
+      err.message ||
+      "Error al enviar el correo.";
+    showAlert("danger", msg);
+    btnConf.disabled = false;
+    btnConf.className = "btn btn-info px-4";
+    btnConf.innerHTML = '<i class="fas fa-paper-plane mr-1"></i> Enviar';
   }
 }

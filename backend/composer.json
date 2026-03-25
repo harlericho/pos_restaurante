@@ -4,7 +4,8 @@
   "type": "project",
   "require": {
     "php": ">=7.4",
-    "firebase/php-jwt": "^5.5"
+    "firebase/php-jwt": "^5.5",
+    "phpmailer/phpmailer": "^7.0"
   },
   "config": {
     "optimize-autoloader": true,

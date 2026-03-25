@@ -140,10 +140,11 @@ $router->add('PATCH',  '/api/pedidos/{id}/cerrar',                     [PedidoCo
 
 // ── Ventas ────────────────────────────────────────────────────────────────────
 // IMPORTANTE: /api/ventas/reporte debe ir ANTES de /api/ventas/{id}
-$router->add('GET',    '/api/ventas/reporte', [VentaController::class, 'reporte']);
-$router->add('GET',    '/api/ventas',         [VentaController::class, 'index']);
-$router->add('GET',    '/api/ventas/{id}',    [VentaController::class, 'show']);
-$router->add('POST',   '/api/ventas',         [VentaController::class, 'store']);
+$router->add('GET',    '/api/ventas/reporte',      [VentaController::class, 'reporte']);
+$router->add('GET',    '/api/ventas',              [VentaController::class, 'index']);
+$router->add('GET',    '/api/ventas/{id}',         [VentaController::class, 'show']);
+$router->add('POST',   '/api/ventas',              [VentaController::class, 'store']);
+$router->add('POST',   '/api/ventas/{id}/email',   [VentaController::class, 'sendEmail']);
 
 // ── Clientes ──────────────────────────────────────────────────────────────────
 $router->add('GET',    '/api/clientes',       [ClienteController::class, 'index']);
