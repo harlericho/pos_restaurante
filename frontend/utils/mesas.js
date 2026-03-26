@@ -3,14 +3,11 @@
 var _mesas = [];
 
 document.addEventListener("DOMContentLoaded", function () {
-  redirectIfNotLoggedIn();
+  if (!redirectIfNotLoggedIn()) return;
 
   // Solo administradores pueden acceder a este módulo
   var user = getUser();
-  if (!user || user.rol !== "admin") {
-    window.location.href = "unauthorized.html";
-    return;
-  }
+  if (!redirectIfNotAdmin()) return;
 
   // ── User info ───────────────────────────────────────────────────────────
   if (user) {

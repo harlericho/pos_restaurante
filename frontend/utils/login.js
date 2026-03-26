@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // api.js puede haber ocultado el html — mostrarlo si la sesión no es válida
   if (isLoggedIn()) {
-    window.location.href = "index.html";
+    window.location.replace("index.html");
     return;
   }
+  document.documentElement.style.visibility = "";
 
   var form = document.getElementById("form-login");
   var errorEl = document.getElementById("error-msg");

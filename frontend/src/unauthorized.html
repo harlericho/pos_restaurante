@@ -85,6 +85,11 @@
 
     <script src="../utils/api.js"></script>
     <script>
+      // Sin sesión activa → ir al login directamente
+      if (!isLoggedIn()) {
+        window.location.replace("login.html");
+      }
+
       // Destino según rol del usuario logueado
       var user = getUser();
       var home = user && user.rol === "admin" ? "index.html" : "pedidos.html";

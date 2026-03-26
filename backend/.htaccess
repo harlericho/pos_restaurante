@@ -1,0 +1,3 @@
+# Solo permitir acceso web a la carpeta public/
+# Todo lo demas (config, models, controllers, etc.) debe ser inaccesible
+RedirectMatch 403 ^/pos_restaurante/backend/(?!public/).*$

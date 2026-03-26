@@ -1,13 +1,10 @@
 // utils/configuracion.js
 
 document.addEventListener("DOMContentLoaded", function () {
-  redirectIfNotLoggedIn();
+  if (!redirectIfNotLoggedIn()) return;
 
   var user = getUser();
-  if (!user || user.rol !== "admin") {
-    window.location.href = "unauthorized.html";
-    return;
-  }
+  if (!redirectIfNotAdmin()) return;
 
   // ── User info ────────────────────────────────────────────────────────
   var roleCap = user.rol.charAt(0).toUpperCase() + user.rol.slice(1);

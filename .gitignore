@@ -1,0 +1,16 @@
+# ─── Base de datos ────────────────────────────────────────────
+backend/data/db.sql
+
+
+# ─── Dependencias ─────────────────────────────────────────────
+vendor/
+node_modules/
+
+# ─── Configuración sensible (credenciales) ────────────────────
+backend/config/init/mail.ini
+
+# ─── Logs y temporales ────────────────────────────────────────
+*.log
+*.cache
+.DS_Store
+Thumbs.db

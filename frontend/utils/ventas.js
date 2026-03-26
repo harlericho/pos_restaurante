@@ -5,7 +5,7 @@ var _reporteCargado = false;
 var _currentVenta = null;
 
 document.addEventListener("DOMContentLoaded", function () {
-  redirectIfNotLoggedIn();
+  if (!redirectIfNotLoggedIn()) return;
 
   // ── User info ────────────────────────────────────────────────────────
   var user = getUser();

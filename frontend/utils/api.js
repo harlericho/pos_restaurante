@@ -81,12 +81,33 @@ function isLoggedIn() {
 function logout() {
   removeToken();
   removeUser();
-  window.location.href = "login.html";
+  // replace() elimina la página actual del historial → el botón "atrás" no la recupera
+  window.location.replace("login.html");
 }
 function redirectIfNotLoggedIn() {
+  // Ocultar inmediatamente para evitar flash en carga inicial
+  document.documentElement.style.visibility = "hidden";
+
   if (!isLoggedIn()) {
-    window.location.href = "login.html";
+    window.location.replace("login.html");
+    return false; // ← IMPORTANTE: retorna false para que el llamador pueda hacer return
   }
+
+  // Sesión válida: mostrar el contenido
+  document.documentElement.style.visibility = "";
+
+  // Deshabilitar bfcache en páginas protegidas.
+  window.addEventListener("unload", function () {});
+  return true;
+}
+// Centraliza el chequeo de rol admin — también deshabilita bfcache
+function redirectIfNotAdmin() {
+  var user = getUser();
+  if (!user || user.rol !== "admin") {
+    window.location.replace("unauthorized.html");
+    return false;
+  }
+  return true;
 }
 
 // ============ Generic Request ============

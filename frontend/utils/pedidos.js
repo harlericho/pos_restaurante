@@ -6,7 +6,7 @@ var _filtroEstado = null;
 var _pedidoActivo = null; // objeto con id + estado del pedido en el modal
 
 document.addEventListener("DOMContentLoaded", function () {
-  redirectIfNotLoggedIn();
+  if (!redirectIfNotLoggedIn()) return;
 
   // ── User info ────────────────────────────────────────────────────────
   var user = getUser();

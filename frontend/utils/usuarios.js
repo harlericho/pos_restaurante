@@ -3,7 +3,7 @@
 var _usuarios = [];
 
 document.addEventListener("DOMContentLoaded", function () {
-  redirectIfNotLoggedIn();
+  if (!redirectIfNotLoggedIn()) return;
 
   // Solo admin puede acceder a esta página
   var user = getUser();

@@ -1,12 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
-  redirectIfNotLoggedIn();
+  if (!redirectIfNotLoggedIn()) return;
 
-  // Solo admin puede ver el dashboard
+  // Solo admin puede ver el dashboard — usa redirectIfNotAdmin para bfcache
   var user = getUser();
   if (user && user.rol !== "admin") {
-    window.location.href = "pedidos.html";
+    window.location.replace("pedidos.html");
     return;
   }
+  if (!redirectIfNotAdmin()) return;
 
   if (user) {
     var nameEl = document.getElementById("nav-user-name");

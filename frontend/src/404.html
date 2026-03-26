@@ -101,7 +101,7 @@
         countEl.textContent = secs;
         if (secs <= 0) {
           clearInterval(timer);
-          window.location.href = home;
+          window.location.replace(home);
         }
       }, 1000);
     </script>

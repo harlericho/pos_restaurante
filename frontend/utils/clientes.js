@@ -5,11 +5,11 @@ var _dtClientes = null;
 var _userRol = null;
 
 document.addEventListener("DOMContentLoaded", function () {
-  redirectIfNotLoggedIn();
+  if (!redirectIfNotLoggedIn()) return;
 
   var user = getUser();
   if (!user) {
-    window.location.href = "unauthorized.html";
+    window.location.replace("unauthorized.html");
     return;
   }
   _userRol = user.rol;
