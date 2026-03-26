@@ -1,0 +1,12 @@
+; ===========================
+; Configuración de correo SMTP
+; ===========================
+; Copia este archivo como mail.ini y completa los valores reales.
+; NUNCA subas mail.ini a git (está en .gitignore).
+
+MAIL_HOST      = "smtp.tudominio.com"
+MAIL_PORT      = 465
+MAIL_USERNAME  = "correo@tudominio.com"
+MAIL_PASSWORD  = "tu_password_aqui"
+MAIL_FROM      = "correo@tudominio.com"
+MAIL_FROM_NAME = "Nombre Empresa"
