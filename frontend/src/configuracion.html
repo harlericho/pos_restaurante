@@ -354,6 +354,61 @@
                   </form>
                 </div>
               </div>
+              <!-- Impresora Térmica -->
+              <div class="col-md-6 mt-0">
+                <div class="card card-warning">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <i class="fas fa-print mr-2"></i>Impresora Térmica
+                    </h3>
+                  </div>
+                  <div class="card-body">
+                    <p class="text-muted mb-3">
+                      Seleccione la impresora térmica para imprimir tickets de
+                      venta. Requiere que
+                      <strong>QZ Tray</strong> esté instalado y ejecutándose en
+                      este equipo.
+                    </p>
+
+                    <div class="form-group">
+                      <label for="select-impresora"
+                        >Impresora seleccionada</label
+                      >
+                      <div class="input-group">
+                        <select id="select-impresora" class="form-control">
+                          <option value="">— Sin configurar —</option>
+                        </select>
+                        <div class="input-group-append">
+                          <button
+                            type="button"
+                            id="btn-detectar-impresoras"
+                            class="btn btn-outline-secondary"
+                            title="Detectar impresoras disponibles"
+                          >
+                            <i class="fas fa-sync-alt"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <small class="form-text text-muted">
+                        Haga clic en
+                        <i class="fas fa-sync-alt"></i> para listar las
+                        impresoras del equipo vía QZ Tray.
+                      </small>
+                    </div>
+
+                    <div id="impresora-status" class="d-none"></div>
+                  </div>
+                  <div class="card-footer">
+                    <button
+                      type="button"
+                      id="btn-guardar-impresora"
+                      class="btn btn-warning"
+                    >
+                      <i class="fas fa-save mr-1"></i> Guardar impresora
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -379,6 +434,7 @@
     <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <script src="../dist/js/adminlte.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
     <script src="../utils/api.js"></script>
     <script src="../utils/configuracion.js"></script>
   </body>

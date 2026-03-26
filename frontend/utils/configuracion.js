@@ -38,6 +38,9 @@ document.addEventListener("DOMContentLoaded", function () {
     saveConfig();
   });
 
+  // ── Impresora térmica ─────────────────────────────────────────────────
+  _initPrinterConfig();
+
   // ── Cargar configuración inicial ─────────────────────────────────────
   loadConfig();
 });
@@ -157,4 +160,134 @@ function showAlert(type, msg) {
   setTimeout(function () {
     box.classList.add("d-none");
   }, 5000);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Impresora térmica (QZ Tray + localStorage)
+// ═══════════════════════════════════════════════════════════════════════
+var LS_PRINTER_KEY = "thermal_printer_name";
+
+function _initPrinterConfig() {
+  var selectImp = document.getElementById("select-impresora");
+  var btnDetect = document.getElementById("btn-detectar-impresoras");
+  var btnGuardar = document.getElementById("btn-guardar-impresora");
+  var statusDiv = document.getElementById("impresora-status");
+
+  if (!selectImp || !btnDetect || !btnGuardar) return;
+
+  // Mostrar impresora guardada
+  var saved = localStorage.getItem(LS_PRINTER_KEY);
+  if (saved) {
+    var opt = document.createElement("option");
+    opt.value = saved;
+    opt.textContent = saved;
+    opt.selected = true;
+    selectImp.appendChild(opt);
+    _setImpresoraStatus(
+      "info",
+      '<i class="fas fa-check-circle mr-1"></i>Impresora guardada: <strong>' +
+        _escHtml(saved) +
+        "</strong>",
+    );
+  }
+
+  btnDetect.addEventListener("click", function () {
+    _detectarImpresoras(selectImp, statusDiv);
+  });
+
+  btnGuardar.addEventListener("click", function () {
+    var val = selectImp.value.trim();
+    if (!val) {
+      _setImpresoraStatus("warning", "Seleccione una impresora de la lista.");
+      return;
+    }
+    localStorage.setItem(LS_PRINTER_KEY, val);
+    _setImpresoraStatus(
+      "success",
+      '<i class="fas fa-check-circle mr-1"></i>Impresora <strong>' +
+        _escHtml(val) +
+        "</strong> guardada correctamente.",
+    );
+    showAlert("success", "Impresora térmica guardada: " + val);
+  });
+}
+
+async function _detectarImpresoras(selectEl, statusDiv) {
+  var btnDetect = document.getElementById("btn-detectar-impresoras");
+  if (btnDetect) {
+    btnDetect.disabled = true;
+    btnDetect.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  }
+
+  try {
+    if (typeof qz === "undefined") {
+      _setImpresoraStatus(
+        "danger",
+        '<i class="fas fa-exclamation-triangle mr-1"></i>' +
+          "QZ Tray no está disponible. " +
+          '<a href="https://qz.io/download/" target="_blank" rel="noopener">Descargar QZ Tray</a>',
+      );
+      return;
+    }
+
+    if (!qz.websocket.isActive()) {
+      await qz.websocket.connect({ retries: 2, delay: 0.5 });
+    }
+
+    var printers = await qz.printers.find();
+    if (!Array.isArray(printers) || printers.length === 0) {
+      _setImpresoraStatus(
+        "warning",
+        "No se encontraron impresoras en el equipo.",
+      );
+      return;
+    }
+
+    var saved = localStorage.getItem(LS_PRINTER_KEY) || "";
+
+    // Limpiar opciones previas
+    selectEl.innerHTML =
+      '<option value="">— Seleccione una impresora —</option>';
+    printers.forEach(function (p) {
+      var opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = p;
+      if (p === saved) opt.selected = true;
+      selectEl.appendChild(opt);
+    });
+
+    _setImpresoraStatus(
+      "success",
+      '<i class="fas fa-check-circle mr-1"></i>Se encontraron <strong>' +
+        printers.length +
+        "</strong> impresora(s). Seleccione la térmica y haga clic en Guardar.",
+    );
+  } catch (err) {
+    _setImpresoraStatus(
+      "danger",
+      '<i class="fas fa-exclamation-triangle mr-1"></i>No se pudo conectar a QZ Tray: ' +
+        _escHtml(err.message || String(err)) +
+        ". Verifique que QZ Tray esté iniciado.",
+    );
+  } finally {
+    if (btnDetect) {
+      btnDetect.disabled = false;
+      btnDetect.innerHTML = '<i class="fas fa-sync-alt"></i>';
+    }
+  }
+}
+
+function _setImpresoraStatus(type, html) {
+  var div = document.getElementById("impresora-status");
+  if (!div) return;
+  div.className = "alert alert-" + type + " py-2 mb-0";
+  div.innerHTML = html;
+}
+
+function _escHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }

@@ -617,17 +617,36 @@
                 </div>
               </div>
             </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
+            <div
+              class="modal-footer d-flex align-items-center justify-content-between"
+            >
+              <!-- Opción de imprimir ticket -->
+              <div
+                class="custom-control custom-switch"
+                id="wrap-imprimir-ticket"
               >
-                Cancelar
-              </button>
-              <button type="submit" class="btn btn-success">
-                <i class="fas fa-check mr-1"></i> Registrar Cobro
-              </button>
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  id="chk-imprimir-ticket"
+                  checked
+                />
+                <label class="custom-control-label" for="chk-imprimir-ticket">
+                  <i class="fas fa-print mr-1"></i> Imprimir ticket
+                </label>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  class="btn btn-secondary mr-2"
+                  data-dismiss="modal"
+                >
+                  Cancelar
+                </button>
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-check mr-1"></i> Registrar Cobro
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -683,6 +702,13 @@
               id="btn-descargar-factura"
             >
               <i class="fas fa-file-pdf mr-1"></i> Descargar Factura
+            </button>
+            <button
+              type="button"
+              class="btn btn-warning px-4 mr-2"
+              id="btn-imprimir-ticket"
+            >
+              <i class="fas fa-print mr-1"></i> Imprimir Ticket
             </button>
             <button
               type="button"
@@ -776,6 +802,8 @@
     <!-- pdfmake -->
     <script src="../plugins/pdfmake/pdfmake.min.js"></script>
     <script src="../plugins/pdfmake/vfs_fonts.js"></script>
+    <!-- QZ Tray (impresora térmica) -->
+    <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
     <!-- App -->
     <script src="../utils/api.js"></script>
     <script src="../utils/ventas.js"></script>
