@@ -53,11 +53,17 @@ class ProductoController
       }
     }
 
+    $tipo  = in_array($body['tipo'] ?? '', ['elaborado', 'terminado']) ? $body['tipo'] : 'elaborado';
+    $stock = isset($body['stock']) ? (float) $body['stock'] : 0;
+
     $newId = $this->model->create([
       'nombre'       => $nombre,
       'descripcion'  => $body['descripcion'] ?? null,
       'precio'       => (float) $precio,
       'categoria_id' => !empty($body['categoria_id']) ? (int) $body['categoria_id'] : null,
+      'codigo'       => $body['codigo'] ?? null,
+      'tipo'         => $tipo,
+      'stock'        => $stock,
     ]);
 
     Response::json(201, [
