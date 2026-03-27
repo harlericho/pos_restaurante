@@ -522,17 +522,34 @@ function initDataTable(selector, numCols) {
 }
 
 function showAlert(type, msg) {
-  var box = document.getElementById("alert-box");
-  if (!type || !msg) {
-    box.className = "d-none";
-    box.innerHTML = "";
-    return;
+  if (!msg) return; // Si no hay mensaje, no hagas nada
+
+  var container = document.getElementById("alert-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "alert-container";
+    // Posición fija para que no mueva el contenido de tu página
+    container.style.cssText =
+      "position: fixed; top: 20px; right: 20px; z-index: 10000; min-width: 300px;";
+    document.body.appendChild(container);
   }
-  box.className = "alert alert-" + type + " alert-dismissible fade show";
-  box.innerHTML =
-    escapeHtml(msg) +
-    '<button type="button" class="close" data-dismiss="alert">' +
-    "<span>&times;</span></button>";
+
+  var alertDiv = document.createElement("div");
+  // Añadimos 'shadow' para que se vea profesional
+  alertDiv.className =
+    "alert alert-" + type + " alert-dismissible fade show shadow border-0";
+  alertDiv.style.marginBottom = "10px";
+  alertDiv.innerHTML =
+    msg +
+    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+    '<span aria-hidden="true">&times;</span></button>';
+
+  container.appendChild(alertDiv);
+
+  // Auto-eliminar después de 4 segundos
+  setTimeout(function () {
+    $(alertDiv).alert("close");
+  }, 4000);
 }
 
 function escapeHtml(str) {

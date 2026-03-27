@@ -416,14 +416,32 @@ function initDataTable(selector, numCols) {
 }
 
 function showAlert(type, msg) {
-  var box = document.getElementById("alert-box");
-  box.className = "alert alert-" + type + " alert-dismissible fade show";
-  box.innerHTML =
+  // 1. Buscar el contenedor de alertas o crearlo si no existe
+  var container = document.getElementById("alert-container");
+  if (!container) {
+    // Si no tienes un contenedor fijo, puedes usar el body o un área específica
+    container = document.createElement("div");
+    container.id = "alert-container";
+    container.style.cssText =
+      "position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;";
+    document.body.appendChild(container);
+  }
+
+  // 2. Crear un NUEVO elemento de alerta para cada mensaje
+  var alertDiv = document.createElement("div");
+  alertDiv.className = "alert alert-" + type + " alert-dismissible fade show";
+  alertDiv.role = "alert";
+  alertDiv.innerHTML =
     msg +
-    '<button type="button" class="close" data-dismiss="alert">' +
-    "<span>&times;</span></button>";
+    '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+    '<span aria-hidden="true">&times;</span></button>';
+
+  // 3. Agregarlo al contenedor
+  container.appendChild(alertDiv);
+
+  // 4. Auto-eliminar solo este mensaje después de 4 segundos
   setTimeout(function () {
-    box.className = "d-none";
+    $(alertDiv).alert("close");
   }, 4000);
 }
 
