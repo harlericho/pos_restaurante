@@ -274,7 +274,7 @@ async function verPedido(id) {
     var resp = await PedidosAPI.getById(id);
     var p = resp.data || resp;
 
-    _pedidoActivo = { id: p.id, estado: p.estado };
+    _pedidoActivo = { id: p.id, estado: p.estado, detalle: p.detalle || [] };
 
     // Header
     document.getElementById("modal-ver-pedido-title").innerHTML =
@@ -382,8 +382,14 @@ function renderDetalle(detalle, estado) {
 }
 
 function fillProductosSelect() {
-  var select = document.getElementById("item-producto");
-  select.innerHTML =
+  var $select = $("#item-producto");
+
+  // Destruir instancia previa si existe
+  if ($select.hasClass("select2-hidden-accessible")) {
+    $select.select2("destroy");
+  }
+
+  $select.html(
     '<option value="">— Seleccione producto —</option>' +
     _productos
       .map(function (prod) {
@@ -399,7 +405,21 @@ function fillProductosSelect() {
           "</option>"
         );
       })
-      .join("");
+      .join("")
+  );
+
+  $select.select2({
+    theme: "bootstrap4",
+    placeholder: "— Buscar producto —",
+    allowClear: true,
+    width: "100%",
+    language: {
+      noResults: function () { return "No se encontraron productos"; },
+      searching: function () { return "Buscando…"; },
+    },
+    dropdownParent: $("#modal-ver-pedido"),
+  });
+
   document.getElementById("item-cantidad").value = "1";
 }
 
@@ -409,7 +429,7 @@ function fillProductosSelect() {
 async function agregarItem() {
   if (!_pedidoActivo) return;
 
-  var productoId = document.getElementById("item-producto").value;
+  var productoId = parseInt(document.getElementById("item-producto").value, 10);
   var cantidad = parseInt(document.getElementById("item-cantidad").value, 10);
 
   if (!productoId) {
@@ -421,11 +441,24 @@ async function agregarItem() {
     return;
   }
 
+  // Si el producto ya está en el pedido, sumar cantidades
+  var itemExistente = (_pedidoActivo.detalle || []).find(function (d) {
+    return parseInt(d.producto_id) === productoId;
+  });
+
   try {
-    await PedidosAPI.addDetalle(_pedidoActivo.id, {
-      producto_id: parseInt(productoId),
-      cantidad: cantidad,
-    });
+    if (itemExistente) {
+      await PedidosAPI.removeDetalle(_pedidoActivo.id, itemExistente.id);
+      await PedidosAPI.addDetalle(_pedidoActivo.id, {
+        producto_id: productoId,
+        cantidad: parseInt(itemExistente.cantidad) + cantidad,
+      });
+    } else {
+      await PedidosAPI.addDetalle(_pedidoActivo.id, {
+        producto_id: productoId,
+        cantidad: cantidad,
+      });
+    }
     // Refrescar el modal con los datos actualizados
     await verPedido(_pedidoActivo.id);
     // Recargar lista de pedidos en segundo plano para actualizar totales
