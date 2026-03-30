@@ -1,5 +1,48 @@
 const BASE_URL = "http://localhost/pos_restaurante/backend/public";
 
+// ── Cargar SweetAlert2 dinámicamente (usado por el interceptor de sesión) ──────
+(function () {
+  if (window.Swal) return;
+  var link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "../plugins/sweetalert2/sweetalert2.min.css";
+  document.head.appendChild(link);
+  var script = document.createElement("script");
+  script.src = "../plugins/sweetalert2/sweetalert2.all.min.js";
+  document.head.appendChild(script);
+})();
+
+// ── Interceptor de sesión expirada ────────────────────────────────────────────
+var _sessionExpiredShown = false;
+
+function handleTokenExpired() {
+  if (_sessionExpiredShown) return;
+  _sessionExpiredShown = true;
+
+  removeToken();
+  removeUser();
+
+  var doRedirect = function () {
+    window.location.replace("login.html");
+  };
+
+  if (typeof Swal !== "undefined") {
+    Swal.fire({
+      icon: "warning",
+      title: "Sesión expirada",
+      text: "Tu sesión ha expirado. Por favor inicia sesión nuevamente.",
+      confirmButtonText: "Iniciar sesión",
+      confirmButtonColor: "#3085d6",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      timer: 8000,
+      timerProgressBar: true,
+    }).then(doRedirect);
+  } else {
+    doRedirect();
+  }
+}
+
 // ── Tema oscuro / claro — aplicar antes de DOMContentLoaded para evitar flash ─
 (function () {
   if (localStorage.getItem("pos_theme") === "light") {
@@ -134,6 +177,17 @@ async function request(method, endpoint, body) {
     throw parseErr;
   }
   if (!response.ok) {
+    // Token expirado o inválido → mostrar alerta y redirigir al login
+    if (
+      response.status === 401 ||
+      (response.status === 403 &&
+        data.error &&
+        /token|expirado|inv[aá]lido/i.test(data.error))
+    ) {
+      handleTokenExpired();
+      return new Promise(function () {}); // suspender la cadena de promesas
+    }
+
     var err = new Error(data.error || "Error en la solicitud");
     err.status = response.status;
     err.data = data;
