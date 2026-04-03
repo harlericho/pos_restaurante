@@ -1,0 +1,8 @@
+; ===========================
+; Configuración de JWT
+; ===========================
+; Copia este archivo como jwt.ini y completa los valores reales.
+; NUNCA subas jwt.ini a git (está en .gitignore).
+
+JWT_SECRET = "cambia_esto_por_una_clave_secreta_segura"
+JWT_EXPIRATION = 3600  ;tiempo en segundos (1 hora)

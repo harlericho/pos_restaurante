@@ -8,6 +8,8 @@ node_modules/
 
 # ─── Configuración sensible (credenciales) ────────────────────
 backend/config/init/mail.ini
+backend/config/init/config.ini
+backend/config/init/jwt.ini
 
 # ─── Logs y temporales ────────────────────────────────────────
 *.log
