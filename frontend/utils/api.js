@@ -14,11 +14,13 @@ const BASE_URL = "http://localhost/pos_restaurante/backend/public";
 
 // ── Interceptor de sesión expirada ────────────────────────────────────────────
 var _sessionExpiredShown = false;
+var _sessionTimer = null;
 
 function handleTokenExpired() {
   if (_sessionExpiredShown) return;
   _sessionExpiredShown = true;
 
+  clearSessionTimer();
   removeToken();
   removeUser();
 
@@ -42,6 +44,48 @@ function handleTokenExpired() {
     doRedirect();
   }
 }
+
+// ── Timer proactivo: dispara handleTokenExpired() exactamente al vencer el JWT ─
+function getJwtExpiration(token) {
+  try {
+    var payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp ? payload.exp * 1000 : null; // convertir a ms
+  } catch (e) {
+    return null;
+  }
+}
+
+function clearSessionTimer() {
+  if (_sessionTimer) {
+    clearTimeout(_sessionTimer);
+    _sessionTimer = null;
+  }
+}
+
+function scheduleSessionExpiry(token) {
+  clearSessionTimer();
+  var expMs = getJwtExpiration(token);
+  if (!expMs) return;
+
+  var msUntilExpiry = expMs - Date.now();
+  if (msUntilExpiry <= 0) {
+    // El token ya expiró (p.ej. al recargar la página)
+    handleTokenExpired();
+    return;
+  }
+
+  _sessionTimer = setTimeout(function () {
+    handleTokenExpired();
+  }, msUntilExpiry);
+}
+
+// Iniciar el timer si ya hay un token guardado (recarga de página)
+(function () {
+  var existingToken = localStorage.getItem("pos_token");
+  if (existingToken) {
+    scheduleSessionExpiry(existingToken);
+  }
+})();
 
 // ── Tema oscuro / claro — aplicar antes de DOMContentLoaded para evitar flash ─
 (function () {
@@ -104,6 +148,7 @@ function getToken() {
 }
 function setToken(token) {
   localStorage.setItem("pos_token", token);
+  scheduleSessionExpiry(token);
 }
 function removeToken() {
   localStorage.removeItem("pos_token");
@@ -122,6 +167,7 @@ function isLoggedIn() {
   return !!getToken();
 }
 function logout() {
+  clearSessionTimer();
   removeToken();
   removeUser();
   // replace() elimina la página actual del historial → el botón "atrás" no la recupera
@@ -179,10 +225,11 @@ async function request(method, endpoint, body) {
   if (!response.ok) {
     // Token expirado o inválido → mostrar alerta y redirigir al login
     if (
-      response.status === 401 ||
-      (response.status === 403 &&
-        data.error &&
-        /token|expirado|inv[aá]lido/i.test(data.error))
+      endpoint !== "/api/auth/login" &&
+      (response.status === 401 ||
+        (response.status === 403 &&
+          data.error &&
+          /token|expirado|inv[aá]lido/i.test(data.error)))
     ) {
       handleTokenExpired();
       return new Promise(function () {}); // suspender la cadena de promesas
